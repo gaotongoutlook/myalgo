@@ -1,18 +1,11 @@
 package org.example.treenode;
 
+import jdk.nashorn.internal.runtime.linker.LinkerCallSite;
 import org.example.pojo.TreeNode;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class MyTreeNode {
-
-    public static void main(String[] args) {
-        new MyTreeNode().Print();
-
-    }
 
     /**
      * 输出二叉树的右视图
@@ -210,6 +203,120 @@ public class MyTreeNode {
         return false;
     }
 
+    public static void main(String[] args) {
+        TreeNode leftLeftNode = new TreeNode(5);
+        TreeNode leftRightNode = new TreeNode(1);
 
+        TreeNode rightLeftNode = new TreeNode(7);
+        TreeNode rightRightNode = new TreeNode(8);
+
+        TreeNode leftNode = new TreeNode(9, leftLeftNode, leftRightNode);
+        TreeNode rightNode = new TreeNode(0, rightLeftNode, rightRightNode);
+
+        TreeNode root = new TreeNode(4, leftNode, rightNode);
+
+        ArrayList<Integer> list = new MyTreeNode().sumNumbers2(root);
+        System.out.println();
+        for(Integer num : list) {
+            System.out.println(num);
+        }
+        System.out.println();
+    }
+
+    public ArrayList<Integer> sumNumbers2(TreeNode root) {
+        ArrayList<Integer> result = new ArrayList<>();
+        if(root == null) {
+            return result;
+        }
+        sumNumbers3(root, new ArrayList<>(), 0, result);
+        return result;
+    }
+
+    public int sumNumbers3(TreeNode node, ArrayList<Integer> list, int deep, ArrayList<Integer> result) {
+        if(node == null) {
+            int num = 0;
+            for(int i=deep; i>0; i--) {
+                num = num * 10 + list.get(i);
+            }
+            result.add(num);
+            deep--;
+            list.remove(deep);
+            return num;
+        }
+
+        // 生成数字 这儿存储插入数字
+        list.add(node.val);
+        deep++;
+
+        if(node.left != null) {
+            sumNumbers3(node.left, list, deep, result);
+        }
+        if(node.right != null) {
+            sumNumbers3(node.right, list, deep, result);
+        }
+
+        return 0;
+    }
+
+
+    /**
+     * 二叉树所有根到叶子路径组成的数字之和
+     * @param root
+     * @return
+     */
+    public int sumNumbers(TreeNode root) {
+        return sumNumbers(root, 0);
+    }
+
+    public int sumNumbers(TreeNode node, int sum) {
+        if(node == null) {
+            return 0;
+        }
+
+        sum = sum * 10 + node.val;
+        if(node.left == null && node.right == null) {
+            return sum;
+        }
+
+        return sumNumbers(node.left, sum) + sumNumbers(node.right, sum);
+    }
+
+    public int sumNumbers1(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+
+        Stack<TreeNode> nodeStack = new Stack<>();
+        Stack<Integer> sumStack = new Stack<>();
+        nodeStack.push(root);
+        sumStack.push(root.val);
+
+        int totalSum = 0;
+
+        while (!nodeStack.isEmpty()) {
+            TreeNode node = nodeStack.pop();
+            int currentSum = sumStack.pop();
+
+            // 如果是叶子节点，累加到总和
+            if (node.left == null && node.right == null) {
+                totalSum += currentSum;
+                continue;
+            }
+
+            // 处理右子节点
+            if (node.right != null) {
+                nodeStack.push(node.right);
+                sumStack.push(currentSum * 10 + node.right.val);
+            }
+
+            // 处理左子节点
+            if (node.left != null) {
+                nodeStack.push(node.left);
+                sumStack.push(currentSum * 10 + node.left.val);
+            }
+        }
+
+        return totalSum;
+    }
 
 }

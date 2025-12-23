@@ -7,7 +7,11 @@ import org.example.pojo.TreeNode;
  */
 public class RobberyModel {
 
-
+    /**
+     * 相邻的不能打劫
+     * @param nums
+     * @return
+     */
     public int rob(int[] nums) {
         if(nums.length == 0) {
             return 0;
@@ -27,6 +31,11 @@ public class RobberyModel {
         return Math.max(dp[n-1][0], dp[n-1][1]);
     }
 
+    /**
+     * 二叉树，相邻的不能打劫
+     * @param root
+     * @return
+     */
     public int rob(TreeNode root) {
         int[] money = postorder(root);
         return Math.max(money[0], money[1]);
@@ -43,5 +52,7 @@ public class RobberyModel {
         money[1] = (leftMoney[0] + rightMoney[0]) + root.val;
         return money;
     }
+
+
 
 }
