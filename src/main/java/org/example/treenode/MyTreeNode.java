@@ -10,7 +10,7 @@ import java.util.Queue;
 public class MyTreeNode {
 
     public static void main(String[] args) {
-        new MyTreeNode().Print();
+        //new MyTreeNode().Print();
 
     }
 
