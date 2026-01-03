@@ -83,8 +83,44 @@ public class PathModel {
      * 不同路径
      * 到达某一点有多少种到达方法 中间存在障碍物
      */
-    public int uniquePaths2(int m, int n) {
-        return 0;
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+
+        int[][] dp = new int[m][n];
+        if(obstacleGrid[0][0] == 1) { // 有障碍，没有走法
+            dp[0][0] = 0;
+        } else {
+            dp[0][0] = 1;
+        }
+
+        for(int j=1; j<n; j++) {
+            if(obstacleGrid[0][j] == 1) {
+                dp[0][j] = 0;
+            } else {
+                dp[0][j] = dp[0][j-1];
+            }
+        }
+
+        for(int i=1; i<m; i++) {
+            if(obstacleGrid[i][0] == 1) {
+                dp[i][0] = 0;
+            } else {
+                dp[i][0] = dp[i-1][0];
+            }
+        }
+
+        for(int i=1; i<m; i++) {
+            for(int j=1; j<n; j++) {
+                if(obstacleGrid[i][j] == 1) {
+                    dp[i][j] = 0;
+                } else {
+                    dp[i][j] = dp[i-1][j] + dp[i][j-1];
+                }
+            }
+        }
+
+        return dp[m-1][n-1];
     }
 
     /**
@@ -129,7 +165,26 @@ public class PathModel {
      * @return
      */
     public int minimumTotal(List<List<Integer>> triangle) {
-        return 0;
+        int n = triangle.size();
+
+        int[][] dp = new int[n][n];
+        dp[0][0] = triangle.get(0).get(0);
+        for(int i=1; i<n; i++) {
+            dp[i][0] = dp[i-1][0] + triangle.get(i).get(0);
+            for(int j=1; j<i; j++) {
+                dp[i][j] = Math.min(dp[i-1][j], dp[i-1][j-1]+triangle.get(i).get(j));
+            }
+            dp[i][i] = dp[i-1][i-1] + triangle.get(i).get(i);
+        }
+
+        int res = Integer.MAX_VALUE;
+        for(int j=0; j<n; j++) {
+            if(dp[n-1][j] < res) {
+                res = dp[n-1][j];
+            }
+        }
+
+        return res;
     }
 
 }
