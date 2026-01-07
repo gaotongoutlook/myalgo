@@ -628,7 +628,7 @@ public class MyTraceBack {
             result.add(new ArrayList<>(res));
         }
         Set<Integer> visit = new HashSet<>();
-        for (int j = index+1; j < candidates.length; j++) {
+        for (int j = index; j < candidates.length; j++) {
             if (visit.contains(candidates[j])) {
                 continue;
             } else {
@@ -637,22 +637,20 @@ public class MyTraceBack {
             if (curr + candidates[j] > target){
                 //此路不通，后路肯定也不通
                 break;
-            } else {
-                //继续试
-                res.add(candidates[j]);
-                int len = res.size();
-                trace(result, res,candidates,target,curr+candidates[j],j);
-                res.remove(len-1);
             }
+            //继续试
+            res.add(candidates[j]);
+            int len = res.size();
+            trace(result, res,candidates,target,curr+candidates[j],j+1);
+            res.remove(len-1);
         }
     }
 
     public List<List<Integer>> combinationSum3(int[] candidates, int target) {
         List<Integer> res = new ArrayList<>();
         List<List<Integer>> result = new ArrayList<List<Integer>>();
-        int curr = 0;
         Arrays.sort(candidates);
-        trace(result, res,candidates,target,curr,-1);
+        trace(result, res,candidates,target,0,0);
         return result;
     }
 
