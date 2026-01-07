@@ -1,6 +1,7 @@
 package org.example.mydp;
 
 import com.sun.deploy.panel.ITreeNode;
+import com.sun.java.accessibility.util.Translator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -167,6 +168,79 @@ public class ClimbStairsModel {
         }
 
         return dp[n];
+    }
+
+    public static void main(String[] args) {
+        int number = 1112225678;
+        ArrayList<String> result = new ClimbStairsModel().translateNumList(number);
+        for(String string : result) {
+            System.out.println(string);
+        }
+    }
+
+    public ArrayList<String> translateNumList(int num) {
+        ArrayList<String> result = new ArrayList<>();
+        if(num < 9) {
+            result.add(printCharater(num));
+            return result;
+        }
+
+        List<Integer> digitlist = new ArrayList<>();
+        while (num!=0) {
+            digitlist.add(num%10); // 数字从后边往前边添加
+            num /= 10;
+        }
+
+        int n = digitlist.size();
+        int[] digits = new int[n];
+        for(int i=0; i<n; i++) {
+            digits[i] = digitlist.get(n-i-1); // 从后边往前边复制
+        }
+
+        ArrayList<Integer> temp = new ArrayList<>();
+        translateNumList(digits, 0, n, result, temp);
+        return result;
+    }
+
+    public void translateNumList(int[] digits, int start, int n, ArrayList<String> result, ArrayList<Integer> temp) {
+        if(start == n) {
+            StringBuilder sb = new StringBuilder();
+            for(Integer integer : temp) {
+                sb.append(printCharater(integer));
+            }
+            result.add(sb.toString());
+            return;
+        }
+
+        /*for(int i=start; i<n; i++) {
+            if(temp.contains(digits[i])){
+                continue;
+            }
+            // start 和 start-1 来判断
+            temp.add(digits[start]);
+            translateNumList(digits, start+1, n, result, temp);
+            temp.remove(temp.size()-1);
+        }*/
+
+
+
+        // start 和 start-1 来判断
+        /*temp.add(printCharater(digits[start]));
+        translateNumList(digits, start+1, n, result, temp);
+
+        if(start+1 < n && isValidNum(start, start+1)) {
+            int number = digits[start]*10 + digits[start+1];
+            temp.add(printCharater(number));
+            translateNumList(digits, start+2, n, result, temp);
+        }*/
+    }
+
+    private String printCharater(int num) {
+        if(num < 0 || num > 25) {
+            return "";
+        }
+        char c = (char)('a' + num - 1);
+        return String.valueOf(c);
     }
 
 
