@@ -585,7 +585,7 @@ public class MyTraceBack {
         }*/
     }
 
-    public List<List<Integer>> combinationSum3(int[] candidates, int target) {
+    public List<List<Integer>> combinationSum4(int[] candidates, int target) {
         List<Integer> path = new ArrayList<>();
         List<List<Integer>> result = new ArrayList<List<Integer>>();
         Arrays.sort(candidates);
@@ -598,7 +598,7 @@ public class MyTraceBack {
             //得到预期目标
             result.add(new ArrayList<>(path));
         }
-        Set<Integer> visited = new HashSet<>();
+        Set<Integer> visited = new HashSet<>(); // set的作用范围问题
         for (int j = k; j < candidates.length; j++) {
             if (visited.contains(candidates[j])) { // 添加是否访问过这个参数
                 continue;
@@ -616,5 +616,44 @@ public class MyTraceBack {
         }
     }
 
+
+
+
+
+
+
+    public static void trace(List<List<Integer>> result, List<Integer> res, int[] candidates, int target, int curr, int index) {
+        if (curr == target) {
+            //得到预期目标
+            result.add(new ArrayList<>(res));
+        }
+        Set<Integer> visit = new HashSet<>();
+        for (int j = index+1; j < candidates.length; j++) {
+            if (visit.contains(candidates[j])) {
+                continue;
+            } else {
+                visit.add(candidates[j]);
+            }
+            if (curr + candidates[j] > target){
+                //此路不通，后路肯定也不通
+                break;
+            } else {
+                //继续试
+                res.add(candidates[j]);
+                int len = res.size();
+                trace(result, res,candidates,target,curr+candidates[j],j);
+                res.remove(len-1);
+            }
+        }
+    }
+
+    public List<List<Integer>> combinationSum3(int[] candidates, int target) {
+        List<Integer> res = new ArrayList<>();
+        List<List<Integer>> result = new ArrayList<List<Integer>>();
+        int curr = 0;
+        Arrays.sort(candidates);
+        trace(result, res,candidates,target,curr,-1);
+        return result;
+    }
 
 }
