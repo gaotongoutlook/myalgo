@@ -1,5 +1,7 @@
 package org.example.traceback;
 
+import org.example.utils.PrintUtils;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -653,6 +655,42 @@ public class MyTraceBack {
         }
     }*/
 
+    public List<List<Integer>> combine1(int n, int k) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        int[] nums = new int[n];
+        for(int i=0; i<n; i++) {
+            nums[i] = i+1;
+        }
+        combineBackTrace(nums, 0, k, path, result);
+        return result;
+    }
 
+    private void combineBackTrace(int[] nums, int step, int k, List<Integer> path, List<List<Integer>> result) {
+        if(path.size() == k) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        if(step >= nums.length) {
+            return;
+        }
+
+        // 不选择
+        combineBackTrace(nums, step+1, k, path, result);
+
+        // 选择
+        path.add(nums[step]);
+        // 回溯
+        combineBackTrace(nums, step+1, k, path, result);
+        // 撤销选择
+        path.remove(path.size()-1);
+    }
+
+    public static void main(String[] args) {
+        int n = 4;
+        int k = 2;
+        List<List<Integer>> result = new MyTraceBack().combine1(n, k);
+        PrintUtils.printString(result);
+    }
 
 }

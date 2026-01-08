@@ -11,7 +11,11 @@ public class PrintUtils {
             for(Integer integer : list) {
                 sb.append(integer).append(" , ");
             }
-            sb.replace(sb.length()-2, sb.length(), "]");
+            if(sb.length()>2) {
+                sb.replace(sb.length()-2, sb.length(), "]");
+            } else {
+                sb.append("]");
+            }
             System.out.println(sb.toString());
         }
     }
