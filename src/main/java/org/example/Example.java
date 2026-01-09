@@ -2,9 +2,7 @@ package org.example;
 
 import org.example.utils.PrintUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Example {
 
@@ -58,6 +56,31 @@ public class Example {
         System.out.println("---------- 5.全排列（重复数字） ----------");
         nums = new int[]{1,2,2};
         result = example.five(nums);
+        PrintUtils.printString(result);
+        result.clear();
+
+        // 6.组合总和
+        System.out.println("---------- 6.组合总和 ----------");
+        nums = new int[]{2,4,5,6,7};
+        int target = 9;
+        result = example.six(nums, target);
+        PrintUtils.printString(result);
+        result.clear();
+
+        // 7.组合总和（多次使用）
+        System.out.println("---------- 7.组合总和（多次使用） ----------");
+        nums = new int[]{2,4,5,6,7};
+        target = 9;
+        result = example.seven(nums, target);
+        PrintUtils.printString(result);
+        result.clear();
+
+        // 8.组合总和（重复数字）
+        System.out.println("---------- 8.组合总和（重复数字） ----------");
+        nums = new int[]{1,2,2,4,4,5,6,7};
+        target = 9;
+        Arrays.sort(nums);
+        result = example.eight(nums, target);
         PrintUtils.printString(result);
         result.clear();
     }
@@ -138,7 +161,11 @@ public class Example {
             return;
         }
 
-        for(int i=start; i<nums.length; i++) {
+        for(int i=0; i<nums.length; i++) {
+            if(path.contains(nums[i])) {
+                continue;
+            }
+
             path.add(nums[i]);
             fourBackTrace(nums, i+1, path, result);
             path.remove(path.size()-1);
@@ -149,26 +176,104 @@ public class Example {
         List<List<Integer>> result = new ArrayList<>();
         List<Integer> path = new ArrayList<>();
         Arrays.sort(nums);
-        //fiveBackTrace(nums, 0, path, result);
+        fiveBackTrace(nums, 0, path, result);
         return result;
     }
 
     private void fiveBackTrace(int[] nums, int start, List<Integer> path, List<List<Integer>> result) {
-        if(path.size() == nums.length) {
+        if(path.size() == start) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+
+        Set<Integer> visited = new HashSet<>();
+        for(int i=0; i<nums.length; i++) {
+            if(visited.contains(nums[i])) {
+                continue;
+            }
+            visited.add(nums[i]);
+
+            path.add(nums[i]);
+            fiveBackTrace(nums, start+1, path, result);
+            path.remove(path.size()-1);
+        }
+    }
+
+    public List<List<Integer>> six(int[] nums, int target) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        Arrays.sort(nums);
+        sixBackTrace(nums, 0, target, path, result);
+        return result;
+    }
+
+    private void sixBackTrace(int[] nums, int start, int target, List<Integer> path, List<List<Integer>> result) {
+        if(target == 0) {
             result.add(new ArrayList<>(path));
             return;
         }
 
         for(int i=start; i<nums.length; i++) {
-            if(i>start && nums[i]==nums[i-1]) {
-                continue;
+            if(nums[i] > target) {
+                break;
             }
-
             path.add(nums[i]);
-            fiveBackTrace(nums, i+1, path, result);
+            sixBackTrace(nums, i+1, target-nums[i], path, result);
             path.remove(path.size()-1);
         }
     }
 
+    public List<List<Integer>> seven(int[] nums, int target) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        Arrays.sort(nums);
+        sevenBackTrace(nums, 0, target, path, result);
+        return result;
+    }
 
+    private void sevenBackTrace(int[] nums, int start, int target, List<Integer> path, List<List<Integer>> result) {
+        if(target == 0) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+
+        for(int i=start; i<nums.length; i++) {
+            if(nums[i] > target) {
+                break;
+            }
+            path.add(nums[i]);
+            sevenBackTrace(nums, i, target-nums[i], path, result);
+            path.remove(path.size()-1);
+        }
+    }
+
+    public List<List<Integer>> eight(int[] nums, int target) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        Arrays.sort(nums);
+        eightBackTrace(nums, 0, target, path, result);
+        return result;
+    }
+
+    private void eightBackTrace(int[] nums, int start, int target, List<Integer> path, List<List<Integer>> result) {
+        if(target == 0) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+
+        Set<Integer> visited = new HashSet<>();
+        for(int i=start; i<nums.length; i++) {
+            if(nums[i] > target) {
+                break;
+            }
+            if(visited.contains(nums[i])) {
+                continue;
+            }
+            visited.add(nums[i]);
+
+            path.add(nums[i]);
+            eightBackTrace(nums, i+1, target-nums[i], path, result);
+            path.remove(path.size()-1);
+        }
+    }
 }

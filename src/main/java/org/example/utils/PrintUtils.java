@@ -18,6 +18,7 @@ public class PrintUtils {
             }
             System.out.println(sb.toString());
         }
+        System.out.println();
     }
 
 }
