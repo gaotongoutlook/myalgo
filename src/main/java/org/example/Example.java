@@ -1,6 +1,7 @@
 package org.example;
 
 import org.example.utils.PrintUtils;
+import sun.security.ec.SunEC;
 
 import java.util.*;
 
@@ -83,6 +84,10 @@ public class Example {
         result = example.eight(nums, target);
         PrintUtils.printString(result);
         result.clear();
+
+        System.out.println();
+        n = 3;
+        example.generateParenthesis(n);
     }
 
     public List<List<Integer>> one(int n, int k) {
@@ -175,27 +180,32 @@ public class Example {
     public List<List<Integer>> five(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
         List<Integer> path = new ArrayList<>();
+        boolean[] used = new boolean[nums.length];
         Arrays.sort(nums);
-        fiveBackTrace(nums, 0, path, result);
+        fiveBackTrace(nums, used, path, result);
         return result;
     }
 
-    private void fiveBackTrace(int[] nums, int start, List<Integer> path, List<List<Integer>> result) {
-        if(path.size() == start) {
+    private void fiveBackTrace(int[] nums, boolean[] used, List<Integer> path, List<List<Integer>> result) {
+        if(path.size() == nums.length) {
             result.add(new ArrayList<>(path));
             return;
         }
 
-        Set<Integer> visited = new HashSet<>();
         for(int i=0; i<nums.length; i++) {
-            if(visited.contains(nums[i])) {
+            if(used[i]) {
                 continue;
             }
-            visited.add(nums[i]);
 
+            if(i>0 && nums[i]==nums[i-1] && !used[i-1]) {
+                continue;
+            }
+
+            used[i] = true;
             path.add(nums[i]);
-            fiveBackTrace(nums, start+1, path, result);
+            fiveBackTrace(nums, used, path, result);
             path.remove(path.size()-1);
+            used[i] = false;
         }
     }
 
@@ -276,4 +286,94 @@ public class Example {
             path.remove(path.size()-1);
         }
     }
+
+
+
+
+
+
+
+
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (nums == null || nums.length == 0) {
+            return result;
+        }
+
+        // 先排序，方便去重
+        Arrays.sort(nums);
+        boolean[] used = new boolean[nums.length];
+        List<Integer> path = new ArrayList<>();
+        backtrack(nums, used, path, result);
+        return result;
+    }
+
+    private void backtrack(int[] nums, boolean[] used, List<Integer> path, List<List<Integer>> result) {
+        if (path.size() == nums.length) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            // 如果当前数字已经使用过，跳过
+            if (used[i]) {
+                continue;
+            }
+
+            // 去重关键：如果当前数字和前一个数字相同，且前一个数字没有被使用，跳过
+            // 这样可以保证相同的数字按顺序使用，避免重复排列
+            if (i > 0 && nums[i] == nums[i - 1] && !used[i - 1]) {
+                continue;
+            }
+
+            used[i] = true;
+            path.add(nums[i]);
+
+            backtrack(nums, used, path, result);
+
+            // 回溯
+            path.remove(path.size() - 1);
+            used[i] = false;
+        }
+    }
+
+
+    public List<String> generateParenthesis(int n) {
+        List<String> result = new ArrayList<>();
+        generateParenthesisBackTrace(n, 0, new LinkedList<String>(), result);
+        System.out.println("len :" + result.size());
+        for(String str : result){
+            System.out.println(str);
+        }
+        System.out.println();
+        return result;
+    }
+
+    private void generateParenthesisBackTrace(int n, int step, LinkedList<String> linkedList, List<String> result) {
+        if(n == step) {
+            StringBuilder sb = new StringBuilder();
+            int len = 0;
+            while(len < linkedList.size()) {
+                sb.append(linkedList.get(len));
+                len++;
+            }
+            result.add(sb.toString());
+            return;
+        }
+
+        linkedList.addFirst("(");
+        linkedList.addLast(")");
+        generateParenthesisBackTrace(n, step+1, linkedList, result);
+        linkedList.pollFirst();
+        linkedList.pollLast();
+
+        linkedList.addFirst(")");
+        linkedList.addFirst("(");
+        generateParenthesisBackTrace(n, step+1, linkedList, result);
+        linkedList.pollFirst();
+        linkedList.pollFirst();
+
+
+    }
+
 }

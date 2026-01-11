@@ -271,6 +271,30 @@ public class Test {
         List<Integer> path = new ArrayList<>();
         backtrackStandard(nums, 0, path, result);
         PrintUtils.printString(result);
+
+        System.out.println();
+
+        result.clear();
+        path.clear();
+        nums = new int[]{1,2,3};
+        backtrackStandard(nums, 0, path, result);
+        PrintUtils.printString(result);
+
+
+        System.out.println();
+        System.out.println("----------------------");
+        System.out.println();
+        permute(nums);
+        //PrintUtils.printString(result);
+
+        result.clear();
+        path.clear();
+        System.out.println();
+        nums = new int[]{1,1,2};
+        Arrays.sort(nums);
+        permute(nums);
+        //PrintUtils.printString(result);
+
         return result;
     }
 
@@ -289,6 +313,40 @@ public class Test {
 
             // 递归到下一层
             backtrackStandard(nums, i + 1, path, result);
+
+            // 撤销选择
+            path.remove(path.size() - 1);
+        }
+    }
+
+    public List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        permuteBackTrace(nums, 0, path, result);
+        PrintUtils.printString(result);
+        return result;
+    }
+
+    private void permuteBackTrace(int[] nums, int step, List<Integer> path, List<List<Integer>> result) {
+        if(path.size() == nums.length) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+
+        for (int i = 0; i < nums.length; i++) {
+            if(path.contains(nums[i])) {
+                continue;
+            }
+            // 去重条件（对于重复元素）
+            if (i > 0 && nums[i] == nums[i - 1] && !path.contains(nums[i-1])) {
+                continue;
+            }
+
+            // 做选择
+            path.add(nums[i]);
+
+            // 递归到下一层
+            permuteBackTrace(nums, step+1, path, result);
 
             // 撤销选择
             path.remove(path.size() - 1);
