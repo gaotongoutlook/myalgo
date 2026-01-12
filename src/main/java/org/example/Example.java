@@ -1,8 +1,7 @@
 package org.example;
 
+import org.example.traceback.RestoreIpAddresses;
 import org.example.utils.PrintUtils;
-import sun.security.ec.SunEC;
-
 import java.util.*;
 
 public class Example {
@@ -85,9 +84,14 @@ public class Example {
         PrintUtils.printString(result);
         result.clear();
 
-        System.out.println();
-        n = 3;
-        example.generateParenthesis(n);
+        List<List<String>> stringResult = new ArrayList<>();
+
+        // 9.字符串回文结构
+        System.out.println("---------- 9.字符串回文结构 ----------");
+        String s = new String("abcba");
+        stringResult = example.partition(s);
+        PrintUtils.printStringResult(stringResult);
+        stringResult.clear();
     }
 
     public List<List<Integer>> one(int n, int k) {
@@ -287,13 +291,6 @@ public class Example {
         }
     }
 
-
-
-
-
-
-
-
     public List<List<Integer>> permuteUnique(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
         if (nums == null || nums.length == 0) {
@@ -337,43 +334,176 @@ public class Example {
         }
     }
 
-
+    /**
+     * 括号数量
+     */
     public List<String> generateParenthesis(int n) {
         List<String> result = new ArrayList<>();
-        generateParenthesisBackTrace(n, 0, new LinkedList<String>(), result);
-        System.out.println("len :" + result.size());
-        for(String str : result){
-            System.out.println(str);
-        }
-        System.out.println();
+        char[] path = new char[2*n];
+        generateParenthesisBackTrace(n, 0, 0, 0, path, result);
         return result;
     }
 
-    private void generateParenthesisBackTrace(int n, int step, LinkedList<String> linkedList, List<String> result) {
-        if(n == step) {
-            StringBuilder sb = new StringBuilder();
-            int len = 0;
-            while(len < linkedList.size()) {
-                sb.append(linkedList.get(len));
-                len++;
+    private void generateParenthesisBackTrace(int n, int leftUsed, int rightUsed, int step, char[] path, List<String> result) {
+        if(step == 2*n) {
+            result.add(String.valueOf(path));
+            return;
+        }
+        if(leftUsed < n) {
+            path[step] = '(';
+            generateParenthesisBackTrace(n, leftUsed+1, rightUsed, step+1, path, result);
+        }
+        if(leftUsed > rightUsed && rightUsed < n) { // 右括号数量不能比左括号多，否则不匹配了
+            path[step] = ')';
+            generateParenthesisBackTrace(n, leftUsed, rightUsed+1, step+1, path, result);
+        }
+    }
+
+    /**
+     * 字符串回文结构
+     */
+    public List<List<String>> partition(String s) {
+        List<List<String>> result = new ArrayList<>();
+        List<String> path = new ArrayList<>();
+        partitionBackTrace(s, 0, path, result);
+        return result;
+    }
+
+    private void partitionBackTrace(String s, int step, List<String> path, List<List<String>> result) {
+        if(step == s.length()) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        for(int end=step; end<s.length(); end++) {
+            String subStr = s.substring(step, end+1);
+            // System.out.println("第"+step+"步，字符串为： "+subStr+" ，是不是回文串 "+isPalindrome(subStr));
+            if(isPalindrome(subStr)) {
+                path.add(subStr);
+                partitionBackTrace(s, end+1, path, result);
+                path.remove(path.size()-1);
             }
-            result.add(sb.toString());
+        }
+    }
+
+    private boolean isPalindrome(String s) {
+        int i = 0;
+        int j = s.length()-1;
+        while(i<=j) {
+            if(s.charAt(i) != s.charAt(j)) {
+                return false;
+            }
+            i++;
+            j--;
+        }
+        return true;
+    }
+
+    /**
+     * 手机号对应字母的集合
+     */
+    public List<String> letterCombinations(String digits) {
+        if(digits.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        String[] mappings = new String[10];
+        mappings[2] = "abc";
+        mappings[3] = "efg";
+        mappings[4] = "ghi";
+        mappings[5] = "jkl";
+        mappings[6] = "mno";
+        mappings[7] = "pqrs";
+        mappings[8] = "tuv";
+        mappings[9] = "wxyz";
+
+        List<String> result = new ArrayList<>();
+        char[] path = new char[digits.length()];
+        letterCombinationsBackTrace(mappings, digits, 0, path, result);
+        return result;
+    }
+
+    private void letterCombinationsBackTrace(String[] mappings, String digits, int step, char[] path, List<String> result) {
+        if(digits.length()==step) {
+            result.add(String.valueOf(path));
             return;
         }
 
-        linkedList.addFirst("(");
-        linkedList.addLast(")");
-        generateParenthesisBackTrace(n, step+1, linkedList, result);
-        linkedList.pollFirst();
-        linkedList.pollLast();
-
-        linkedList.addFirst(")");
-        linkedList.addFirst("(");
-        generateParenthesisBackTrace(n, step+1, linkedList, result);
-        linkedList.pollFirst();
-        linkedList.pollFirst();
-
-
+        String mapping = mappings[digits.charAt(step)-'0'];
+        for(int i=0; i<mapping.length(); i++) {
+            path[step] = mapping.charAt(i);
+            letterCombinationsBackTrace(mappings, digits, step+1, path, result);
+        }
     }
+
+    /**
+     * N皇后问题
+     */
+    public List<char[][]> numberQueue(int n) {
+        List<char[][]> result = new ArrayList<>();
+        char[][] path = new char[n][n];
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<n; j++) {
+                path[i][j] = '*';
+            }
+        }
+        numberQueueBackTrace(0, n, path, result);
+        return result;
+    }
+
+    private void numberQueueBackTrace(int row, int n, char[][] path, List<char[][]> result) {
+        if(row == n) {
+            char[][] snapshot = new char[n][n];
+            for(int i=0; i<n; i++) {
+                for(int j=0; j<n; j++) {
+                    snapshot[i][j] = path[i][j];
+                }
+            }
+            result.add(snapshot);
+            return;
+        }
+
+        for(int col=0; col<n; col++) {
+            if(isOk(path, n, row, col)) {
+                path[row][col] = 'Q';
+                numberQueueBackTrace(row+1, n, path, result);
+                path[row][col] = '*';
+            }
+        }
+    }
+
+    private boolean isOk(char[][] path, int n, int row, int col) {
+        // 检查列是否有冲突
+        for(int i=0; i<row; i++) {
+            if(path[i][col] == 'Q') {
+                return false;
+            }
+        }
+
+        // 检查右上对角线是否有冲突
+        int i = row-1;
+        int j = col+1;
+        while (i>=0 && j<n) {
+            if(path[i][j] == 'Q') {
+                return false;
+            }
+            i--;
+            j++;
+        }
+
+        // 检查左上对角线是否有冲突
+        i = row - 1;
+        j = col - 1;
+        while (i>=0 && j>=0) {
+            if(path[i][j] == 'Q') {
+                return false;
+            }
+            i--;
+            j--;
+        }
+
+        return true;
+    }
+
+
 
 }

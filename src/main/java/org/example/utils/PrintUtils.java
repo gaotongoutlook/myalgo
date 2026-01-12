@@ -21,4 +21,21 @@ public class PrintUtils {
         System.out.println();
     }
 
+    public static void printStringResult(List<List<String>> result) {
+        System.out.println("数量: "+ result.size());
+        for(List<String> list : result) {
+            StringBuilder sb = new StringBuilder("[ ");
+            for(String integer : list) {
+                sb.append(integer).append(" , ");
+            }
+            if(sb.length()>2) {
+                sb.replace(sb.length()-2, sb.length(), "]");
+            } else {
+                sb.append("]");
+            }
+            System.out.println(sb.toString());
+        }
+        System.out.println();
+    }
+
 }
