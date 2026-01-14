@@ -23,7 +23,7 @@ public class MyDfsLinkedList {
         System.out.println();
     }
 
-    private static void dfsRecursiveHelper(MyGraph graph, int vertex, boolean[] visited) {
+    public static void dfsRecursiveHelper(MyGraph graph, int vertex, boolean[] visited) {
         visited[vertex] = true;
         System.out.print(vertex + " ");
 

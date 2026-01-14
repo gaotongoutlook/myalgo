@@ -19,7 +19,7 @@ public class MovingCountDfs {
         count++;
         int[][] directions= {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         for(int di=0; di<4; di++) {
-            int newi = j + directions[di][0];
+            int newi = i + directions[di][0];
             int newj = j + directions[di][1];
             if(newi>=m || newi<0 || newj>=n || newj<0 || visited[newi][newj] || !check(newi, newj, k)) {
                 continue;

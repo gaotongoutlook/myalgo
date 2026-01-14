@@ -1,8 +1,10 @@
 package org.example;
 
-import org.example.traceback.RestoreIpAddresses;
+import org.example.dfs.MyGraph;
+import org.example.pojo.TreeNode;
 import org.example.utils.PrintUtils;
 import java.util.*;
+
 
 public class Example {
 
@@ -504,6 +506,333 @@ public class Example {
         return true;
     }
 
+    /**
+     * 二叉树的直径（就是左右子树深度之和）
+     */
+    public int diameterOfBinaryTree(TreeNode root) {
+        int result = 0;
+        diameterOfBinaryTreeBackTrace(root, result);
+        return result;
+    }
+
+    private int diameterOfBinaryTreeBackTrace(TreeNode root, int result) {
+        if(root==null) {
+            return 0;
+        }
+        int leftHeight = diameterOfBinaryTreeBackTrace(root.left, result);
+        int rightHeight = diameterOfBinaryTreeBackTrace(root.right, result);
+        int height = leftHeight + rightHeight; // 计算路径和
+        if(height > result) {
+            result = height;
+        }
+        return Math.max(leftHeight, rightHeight) + 1;
+    }
+
+    /**
+     * 二叉树的路径和 任意两个节点间最大路径和 不存在重复节点
+     */
+    public int maxPathSum(TreeNode root) {
+        int result = -1001;
+        maxPathSumDfs(root, result);
+        return result;
+    }
+
+    private int maxPathSumDfs(TreeNode root, int result) {
+        if(root==null) {
+            return 0;
+        }
+
+        int leftPath = maxPathSumDfs(root.left, result);
+        int rightPath = maxPathSumDfs(root.right, result);
+
+        // 处理最大值
+        int max = 0;
+        if(leftPath > 0) {
+            max += leftPath;
+        }
+        if(rightPath > 0) {
+            max += rightPath;
+        }
+        if(result < max) {
+            max = result;
+        }
+
+        return Math.max(leftPath, rightPath) + root.val;
+    }
+
+
+    /**
+     * 路径和等于某一值
+     */
+    public List<List<Integer>> pathSumBinaryTree(TreeNode root, int sum) {
+        if(root==null) {
+            return null;
+        }
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        path.add(root.val);
+        pathSumBinaryTreeBackTrace(root, sum, 0, path, result);
+        return result;
+    }
+
+    private void pathSumBinaryTreeBackTrace(TreeNode root, int sum, int pathSum, List<Integer> path, List<List<Integer>> result) {
+        if(root.left == null && root.right==null) {
+            if(sum == pathSum) {
+                result.add(new ArrayList<>(path));
+            }
+            return;
+        }
+        if(root.left!=null) {
+            path.add(root.left.val);
+            pathSumBinaryTreeBackTrace(root.left, sum, pathSum+root.left.val, path, result);
+            path.remove(path.size()-1);
+        }
+        if(root.right!=null) {
+            path.add(root.right.val);
+            pathSumBinaryTreeBackTrace(root.right, sum, pathSum+root.right.val, path, result);
+            path.remove(path.size()-1);
+        }
+    }
+
+    /**
+     * 岛屿数量
+     * 定义一个访问了的数组 向上下左右进行搜索
+     */
+    public int numIslands(char[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+
+        int h = grid.length;
+        int w = grid[0].length;
+        boolean[][] visited = new boolean[h][w];
+        int result = 0;
+        for(int i=0; i<h; i++) {
+            for(int j=0; j<w; j++) {
+                if(!visited[i][j] && grid[i][j]=='1') {
+                    result++;
+                    numIslandsDfs(grid, visited, i, j, h, w);
+                }
+            }
+        }
+        return result;
+    }
+
+    private void numIslandsDfs(char[][] grid, boolean[][] visited, int i, int j, int h, int w) {
+        // 上下左右四个方位
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        visited[i][j] = true; // 1 1    2 2    3 3
+        for(int k=0; k<4; k++) {
+            int newi = i + directions[k][0]; // -1 1 0 0     0 2 1 1
+            int newj = j + directions[k][1]; // 0 0 -1 1     1 1 0 2
+            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && grid[newi][newj]=='1') {
+                numIslandsDfs(grid, visited, newi, newj, h, w);
+            }
+        }
+    }
+
+    /**
+     * 矩阵最长递增路径
+     */
+    public int longestIncreasingPath(int[][] matrix) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
+            return 0;
+        }
+
+        int maxLength = 0;
+        int rows = matrix.length;
+        int cols = matrix[0].length;
+
+        // 尝试从每个位置开始寻找最长递增路径
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                maxLength = Math.max(maxLength,
+                        longestIncreasingPathDfs(matrix, i, j, rows, cols, new boolean[rows][cols], 1));
+            }
+        }
+
+        return maxLength;
+    }
+
+    private int longestIncreasingPathDfs(int[][] matrix, int row, int col, int rows, int cols, boolean[][] visited, int currentLength) {
+        // 四个方向
+        int[][] directions = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
+        visited[row][col] = true;
+        int maxLength = currentLength;
+
+        // 尝试四个方向
+        for (int[] dir : directions) {
+            int newRow = row + dir[0];
+            int newCol = col + dir[1];
+            if(newRow>=0 && newRow<rows && newCol>=0 && newCol<cols && !visited[newRow][newCol] && matrix[newRow][newCol] > matrix[row][col]) {
+                // 递归探索
+                int length = longestIncreasingPathDfs(matrix, newRow, newCol, rows, cols, visited, currentLength + 1);
+                maxLength = Math.max(maxLength, length);
+            }
+        }
+        // 回溯：撤销选择
+        visited[row][col] = false;
+
+        return maxLength;
+    }
+
+    /**
+     * BFS遍历
+     */
+    public static void bfsTraversal(MyGraph graph, int startVertex) {
+        boolean[] visited = new boolean[graph.vertices];
+        int[] distance = new int[graph.vertices];
+        Arrays.fill(distance, -1);
+
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(startVertex);
+        visited[startVertex] = true;
+        distance[startVertex] = 0;
+
+        System.out.println("BFS遍历结果:");
+        while(!queue.isEmpty()) {
+            int current = queue.poll();
+            System.out.print(current + " ");
+            System.out.printf("顶点 %d (距离: %d)\n", current, distance[current]);
+
+            for(Integer neighbor : graph.adjList[current]) {
+                if(!visited[neighbor]) {
+                    queue.add(neighbor);
+                    visited[neighbor] = true;
+                    distance[neighbor] = distance[current]+1;
+                }
+            }
+        }
+        System.out.println();
+    }
+
+    /**
+     * 查找从起点到目标的最短路径
+     */
+    public static List<Integer> bfsShortestPath(MyGraph graph, int startVertex, int target) {
+        boolean[] visited = new boolean[graph.vertices];
+        int[] parent = new int[graph.vertices];
+        Arrays.fill(parent, -1);
+
+        Queue<Integer> queue = new LinkedList<>();
+        queue.add(startVertex);
+        visited[startVertex] = true;
+
+        boolean found = false;
+        while(!queue.isEmpty() && !found) {
+            int current = queue.poll();
+            for(Integer neighbor : graph.adjList[current]) {
+                if (!visited[neighbor]) {
+                    queue.add(neighbor);
+                    visited[neighbor] = true;
+                    parent[neighbor] = current;
+                }
+
+                if(neighbor == target) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if(found) {
+            List<Integer> path = new ArrayList<>();
+            for(Integer curr = target; curr!=-1; curr = parent[curr]) {
+                path.add(curr);
+            }
+            Collections.reverse(path);
+            return path;
+        }
+
+        return Collections.emptyList(); // 没有找到路径
+    }
+
+    /**
+     * 递归实现DFS
+     */
+    public static void dfsRecursive(MyGraph graph, int startVertex) {
+        boolean[] visited = new boolean[graph.vertices];
+        System.out.println("DFS递归遍历结果:");
+        dfsRecursiveHelper(graph, startVertex, visited);
+        System.out.println();
+    }
+
+    private static void dfsRecursiveHelper(MyGraph graph, int startVertex, boolean[] visited) {
+        visited[startVertex] = true;
+        LinkedList<Integer> linkedList = graph.adjList[startVertex];
+        for(Integer neighbor : linkedList) {
+            if(!visited[neighbor]) {
+                dfsRecursiveHelper(graph, neighbor, visited);
+            }
+        }
+    }
+
+    /**
+     * 迭代实现DFS（使用栈）
+     */
+    public static void dfsIterative(MyGraph graph, int startVertex) {
+        boolean[] visited = new boolean[graph.vertices];
+        dfsIterativeHelper(graph, startVertex, visited);
+    }
+
+    private static void dfsIterativeHelper(MyGraph graph, int startVertex, boolean[] visited) {
+        Stack<Integer> stack = new Stack<>();
+        stack.push(startVertex);
+
+        while(!stack.isEmpty()) {
+            Integer current = stack.pop();
+
+            if (!visited[current]) {
+                visited[current] = true;
+                LinkedList<Integer> linkedList = graph.adjList[current];
+                Collections.reverse(linkedList); // 注意：为了与递归版本结果一致，需要逆序压入栈
+                for(Integer neighbor : linkedList) {
+                    if (!visited[neighbor]) {
+                        stack.push(neighbor);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 检查图中是否有环（有向图）
+     */
+    public static boolean hasCycle(MyGraph graph) {
+        int vertices = graph.vertices;
+        boolean[] visited = new boolean[vertices];
+        boolean[] recursionStack = new boolean[vertices];
+
+        for (int i = 0; i < vertices; i++) {
+            if (hasCycleBackTrace(graph, i, visited, recursionStack)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean hasCycleBackTrace(MyGraph graph, int vertex, boolean[] visited, boolean[] recursionStack) {
+        if(recursionStack[vertex]) {
+            return true;
+        }
+        if(visited[vertex]) {
+            return false;
+        }
+
+        visited[vertex] = true;
+        recursionStack[vertex] = true;
+
+        for (int neighbor : graph.adjList[vertex]) {
+            if (hasCycleBackTrace(graph, neighbor, visited, recursionStack)) {
+                return true;
+            }
+        }
+
+        recursionStack[vertex] = false; // 撤销选择的目的是？？？
+
+        return false;
+    }
 
 
 }

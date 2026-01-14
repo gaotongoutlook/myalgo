@@ -29,7 +29,7 @@ public class NumIslandsDfs {
         int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         visited[i][j] = true;
         for(int k=0; k<4; k++) {
-            int newi = j + directions[k][0];
+            int newi = i + directions[k][0];
             int newj = j + directions[k][1];
             if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && grid[newi][newj]=='1') {
                 dfs(grid, newi, newj);
