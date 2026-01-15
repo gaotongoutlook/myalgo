@@ -1,9 +1,14 @@
 package org.example;
 
+import jdk.nashorn.internal.runtime.linker.NashornGuards;
+import org.example.dfs.MyGraph;
 import org.example.utils.PrintUtils;
 
 import java.awt.font.NumericShaper;
+import java.net.NetworkInterface;
+import java.sql.ResultSet;
 import java.util.*;
+import java.util.function.BinaryOperator;
 
 public class Test {
 
@@ -351,6 +356,277 @@ public class Test {
             // 撤销选择
             path.remove(path.size() - 1);
         }
+    }
+
+    /**
+     * 岛屿数量
+     */
+    public int numIslands(char[][] grid) {
+        if(grid==null || grid.length==0 || grid[0].length==0) {
+            return 0;
+        }
+
+        int num = 0;
+        int h = grid.length;
+        int w = grid[0].length;
+        boolean[][] visited = new boolean[h][w];
+        for(int i=0; i<h; i++) {
+            for(int j=0; j<w; j++) {
+                visited[i][j] = false;
+            }
+        }
+
+        for(int i=0; i<h; i++) {
+            for (int j = 0; j < w; j++) {
+                if(!visited[i][j] && grid[i][j] == 1) {
+                    numIslandsDfs(grid, visited, 0, 0, h, w);
+                }
+            }
+        }
+
+        return num;
+    }
+
+    private void numIslandsDfs(char[][] grid, boolean[][] visited, int i, int j, int h, int w) {
+        // 上下左右四个方位
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        int newi = 0;
+        int newj = 0;
+        visited[i][j] = true;
+        for(int[] d : directions) {
+            newi = i + d[0];
+            newj = j + d[1];
+            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && grid[newi][newj]==1) {
+                numIslandsDfs(grid, visited, newi, newj, h, w);
+            }
+        }
+    }
+
+    /**
+     * 括号生成
+     */
+    public List<String> generateParenthesis(int n) {
+        if(n <= 0) {
+            return Collections.emptyList();
+        }
+        List<String> result = new ArrayList<>();
+        char[] path = new char[2*n];
+        generateParenthesisBackTrace(n, 0, 0, 0, path, result);
+        return result;
+    }
+
+    private void generateParenthesisBackTrace(int n, int used, int leftUsed, int rightUsed, char[] path, List<String> result) {
+        if(used == 2*n) {
+            result.add(String.valueOf(path));
+            return;
+        }
+        if(leftUsed < n) {
+            path[used] = '(';
+            generateParenthesisBackTrace(n, used+1, leftUsed+1, rightUsed, path, result);
+        }
+        if(leftUsed < rightUsed && rightUsed < n) {
+            path[used] = ')';
+            generateParenthesisBackTrace(n, used+1, leftUsed, rightUsed+1, path, result);
+        }
+    }
+
+    /**
+     * 矩阵最长递增路径
+     */
+    public int longestIncreasingPath(int[][] matrix) {
+        if(matrix==null || matrix.length==0 || matrix[0].length==0) {
+            return 0;
+        }
+
+        int maxLength = 0;
+        int h = matrix.length;
+        int w = matrix[0].length;
+        boolean[][] visited = new boolean[h][w];
+
+        for(int i=0; i<h; i++) {
+            for(int j=0; j<w; j++) {
+                if(visited[i][j]) {
+                    int result = longestIncreasingPathBackTrace(matrix, visited, i, j, h, w, 1);
+                    maxLength = Math.max(maxLength, result);
+                }
+            }
+        }
+
+        return maxLength;
+    }
+
+    private int longestIncreasingPathBackTrace(int[][] matrix, boolean[][] visited, int i, int j, int h, int w, int currentLength) {
+        // 上下左右四个方位
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        int newi = 0;
+        int newj = 0;
+        int maxLength = currentLength;
+        visited[i][j] = true;
+
+        for(int[] d : directions) {
+            newi = i + d[0];
+            newj = j + d[1];
+            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && matrix[newi][newj] > matrix[i][j]) {
+                int result = longestIncreasingPathBackTrace(matrix, visited, newi, newj, h, w, maxLength+1);
+                maxLength = Math.max(result, maxLength);
+            }
+        }
+
+        visited[i][j] = false;
+
+        return maxLength;
+    }
+
+    /**
+     * N皇后
+     */
+    public List<char[][]> numberQueue(int n) {
+        if(n<=0) {
+            return Collections.emptyList();
+        }
+
+        int row = 0;
+        List<char[][]> result = new ArrayList<>();
+        char[][] path = new char[n][n];
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<n; j++) {
+                path[i][j] = '*';
+            }
+        }
+
+        numberQueueBackTrace(n, row, path, result);
+
+        return result;
+    }
+
+    private void numberQueueBackTrace(int n, int row, char[][] path, List<char[][]> result) {
+        if(row == n) {
+            char[][] snapshots = new char[n][n];
+            for(int i=0; i<n; i++) {
+                for(int j=0; j<n; j++) {
+                    snapshots[i][j] = path[i][j];
+                }
+            }
+            result.add(snapshots);
+            return;
+        }
+
+        for(int i=row; i<n; i++) {
+            for(int j=0; j<n; j++) {
+                if(numberQueueIsOK(path, i, j, n)) {
+                    path[i][j] = 'Q';
+                    numberQueueBackTrace(n, row+1, path, result);
+                    path[i][j] = '*';
+                }
+            }
+        }
+    }
+
+    private boolean numberQueueIsOK(char[][] path, int i, int j, int n) {
+        boolean flag = true;
+
+        // 竖行不能有
+        for(int row=0; row<i; row++) {
+            if(path[row][j]=='Q') {
+                return false;
+            }
+        }
+
+        // 左上斜边不能有
+        int row = i-1;
+        int col = j-1;
+        while(row>=0 && col>=0) {
+            if(path[row][col]=='Q') {
+                return false;
+            }
+            row--;
+            col--;
+        }
+
+        // 右上斜边不能有
+        row = i-1;
+        col = j+1;
+        while(row>=0 && col<n) {
+            if(path[row][col]=='Q') {
+                return false;
+            }
+            row--;
+            col++;
+        }
+
+        return flag;
+    }
+
+    /**
+     * BFS遍历 包含统计路径长度
+     */
+    public static void bfsTraversal(MyGraph graph, int startVertex) {
+        boolean[] visited = new boolean[graph.vertices];
+        int[] distance = new int[graph.vertices];
+        Arrays.fill(distance, -1);
+
+        Queue<Integer> queue = new LinkedList<>();
+        visited[startVertex] = true;
+        queue.add(startVertex);
+        distance[startVertex] = 0;
+
+        while(!queue.isEmpty()) {
+            Integer current = queue.poll();
+            for(Integer negi : graph.adjList[current]) {
+                if(!visited[negi]) {
+                    queue.add(negi);
+                    visited[negi] = true;
+                    distance[negi] = distance[current]+1;
+                }
+            }
+        }
+    }
+
+    /**
+     * 递归实现DFS
+     */
+    public static void dfsRecursive(MyGraph graph, int startVertex) {
+        boolean[] visited = new boolean[graph.vertices];
+        dfsRecursiveDfs(graph, visited, startVertex);
+    }
+
+    private static void dfsRecursiveDfs(MyGraph graph, boolean[] visited, int startVertex) {
+        visited[startVertex] = true;
+        for(Integer neighbor : graph.adjList[startVertex]) {
+            if(!visited[neighbor]) {
+                dfsRecursiveDfs(graph, visited, neighbor);
+            }
+        }
+    }
+
+    /**
+     * 迭代实现DFS（使用栈）
+     */
+    public static void dfsIterative(MyGraph graph, int startVertex) {
+        boolean[] visited = new boolean[graph.vertices];
+
+        Stack<Integer> stack = new Stack<>();
+        stack.push(startVertex);
+
+        while(!stack.isEmpty()) {
+            Integer current = stack.pop();
+            visited[current] = true;
+
+            List<Integer> neighbors = graph.adjList[current];
+            Collections.reverse(neighbors);
+            for(Integer neighbor : neighbors) {
+                if(!visited[neighbor]) {
+                    stack.push(neighbor);
+                }
+            }
+        }
+    }
+
+    /**
+     * 查找从起点到目标的最短路径
+     */
+    public static List<Integer> bfsShortestPath(MyGraph graph, int startVertex, int target) {
+        return null;
     }
 
 
