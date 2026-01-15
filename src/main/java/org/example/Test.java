@@ -2,6 +2,7 @@ package org.example;
 
 import jdk.nashorn.internal.runtime.linker.NashornGuards;
 import org.example.dfs.MyGraph;
+import org.example.pojo.TreeNode;
 import org.example.utils.PrintUtils;
 
 import java.awt.font.NumericShaper;
@@ -629,5 +630,135 @@ public class Test {
         return null;
     }
 
+    /**
+     * 二叉树的路径和
+     */
+    public int maxPathSum(TreeNode root) {
+        int result = -1001;
+        maxPathSumDfs(root, result);
+        return result;
+    }
+
+    private int maxPathSumDfs(TreeNode root, int result) {
+        if(root==null) {
+            return 0;
+        }
+
+        int leftPath = maxPathSumDfs(root.left, result);
+        int rightPath = maxPathSumDfs(root.right, result);
+
+        // 处理最大值
+        int max = 0;
+        if(leftPath > 0) {
+            max += leftPath;
+        }
+        if(rightPath > 0) {
+            max += rightPath;
+        }
+        if(result < max) {
+            result = max;
+        }
+
+        return Math.max(leftPath, rightPath) + root.val;
+    }
+
+    /**
+     * 二叉树的直径（就是左右子树深度之和）
+     */
+    public int diameterOfBinaryTree(TreeNode root) {
+        int result = 0;
+        diameterOfBinaryTreeBackTrace(root, result);
+        return result;
+    }
+
+    private int diameterOfBinaryTreeBackTrace(TreeNode root, int result) {
+        if(root==null) {
+            return 0;
+        }
+
+        int leftDepth = diameterOfBinaryTreeBackTrace(root.left, result);
+        int rightDepth = diameterOfBinaryTreeBackTrace(root.right, result);
+        result = Math.max(result, leftDepth+rightDepth);
+
+        return Math.max(leftDepth, rightDepth) + 1;
+    }
+
+    /**
+     * 路径和等于某一值
+     */
+    public List<List<Integer>> pathSumBinaryTree(TreeNode root, int sum) {
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        pathSumBinaryTreeBackTrace(root, 0, sum, path, result);
+        return result;
+    }
+
+    private void pathSumBinaryTreeBackTrace(TreeNode root, int cur, int sum, List<Integer> path, List<List<Integer>> result) {
+        if(root.left==null && root.right==null) {
+            if(cur == sum) {
+                result.add(new ArrayList<>(path));
+            }
+            return;
+        }
+
+        if(root.left != null) {
+            path.add(root.left.val);
+            pathSumBinaryTreeBackTrace(root.left, cur+root.left.val, sum, path, result);
+            path.remove(path.size()-1);
+        }
+
+        if(root.right != null) {
+            path.add(root.right.val);
+            pathSumBinaryTreeBackTrace(root.right, cur + root.right.val, sum, path, result);
+            path.remove(path.size() - 1);
+        }
+    }
+
+    /**
+     * 查找从起点到目标的最短路径
+     */
+    public static List<Integer> bfsShortestPath1(MyGraph graph, int start, int target) {
+        if(start==target) {
+            return Arrays.asList(start);
+        }
+
+        boolean[] visited = new boolean[graph.vertices];
+        int[] parent = new int[graph.vertices];
+        Arrays.fill(parent, -1);
+
+        Queue<Integer> queue = new LinkedList<>();
+        visited[start] = true;
+        queue.add(start);
+
+        boolean found = false;
+
+        while(!queue.isEmpty() && !found) {
+            Integer cur = queue.poll();
+
+            for(Integer neighbor : graph.adjList[cur]) {
+                if(!visited[neighbor]) {
+                    queue.add(neighbor);
+                    visited[neighbor] = true;
+                    parent[neighbor] = cur;
+
+                    if(neighbor == target) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(found) {
+            List<Integer> path = new ArrayList<>();
+            for(Integer at = target; at != -1; at= parent[at]) {
+                path.add(at);
+            }
+            Collections.reverse(path);
+            return path;
+        }
+
+        return Collections.emptyList();
+    }
 
 }
