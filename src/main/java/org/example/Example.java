@@ -3,6 +3,7 @@ package org.example;
 import org.example.dfs.MyGraph;
 import org.example.pojo.TreeNode;
 import org.example.utils.PrintUtils;
+
 import java.util.*;
 
 
@@ -94,6 +95,14 @@ public class Example {
         stringResult = example.partition(s);
         PrintUtils.printStringResult(stringResult);
         stringResult.clear();
+
+        // 目标和 添加加和减方式 让和为目标数字
+        System.out.println("---------- 目标和 ----------");
+        nums = new int[]{2,7,9,13,27,31,37,3,2,3,5,7,11,13,17,19,23,29,47,53};
+        Arrays.sort(nums);
+        target = 7;
+        int res = example.findTargetSumWays1(nums, target);
+        System.out.println("结果为: "+res);
     }
 
     public List<List<Integer>> one(int n, int k) {
@@ -834,7 +843,61 @@ public class Example {
         return false;
     }
 
+    /**
+     * 添加加和减方式 让和为目标数字
+     */
+    public int findTargetSumWays(int[] nums, int target) {
+        if(nums==null || nums.length==0) {
+            return 0;
+        }
+        List<List<Integer>> result = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        findTargetSumWaysBackTrace(nums,  0, 0, target, path, result);
+        return result.size();
+    }
 
+    private void findTargetSumWaysBackTrace(int[] nums, int sum, int step, int target, List<Integer> path, List<List<Integer>> result) {
+        if(nums.length == path.size()) {
+            if(sum == target) {
+                result.add(new ArrayList<>(path));
+            }
+            return;
+        }
+
+        path.add(nums[step]);
+        findTargetSumWaysBackTrace(nums, sum+nums[step], step+1, target, path, result);
+        path.remove(path.size()-1);
+
+
+        path.add(-nums[step]);
+        findTargetSumWaysBackTrace(nums, sum-nums[step], step+1, target, path, result);
+        path.remove(path.size()-1);
+    }
+
+    /**
+     * 添加加和减方式 让和为目标数字
+     */
+    public int findTargetSumWays1(int[] nums, int target) {
+        if(nums == null || nums.length == 0) {
+            return 0;
+        }
+        return findTargetSumWaysBacktrack1(nums, 0, 0, target);
+    }
+
+    private int findTargetSumWaysBacktrack1(int[] nums, int index, int sum, int target) {
+        // 终止条件：处理完所有数字
+        if(index == nums.length) {
+            return sum == target ? 1 : 0;
+        }
+
+        // 当前数字有两种选择：加号或减号
+        System.out.println("addWays: " + sum + " : " + nums[index] + " : " +(sum + nums[index]));
+        int addWays = findTargetSumWaysBacktrack1(nums, index + 1, sum + nums[index], target);
+        System.out.println("subtractWays: " + sum + " : " + nums[index] + " : " +(sum - nums[index]));
+        int subtractWays = findTargetSumWaysBacktrack1(nums, index + 1, sum - nums[index], target);
+
+        return addWays + subtractWays;
+    }
 
 
 

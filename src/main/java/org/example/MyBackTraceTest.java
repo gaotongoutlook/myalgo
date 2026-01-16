@@ -1,14 +1,9 @@
 package org.example;
 
-import com.sun.jndi.rmi.registry.ReferenceWrapper_Stub;
-import com.sun.org.apache.bcel.internal.generic.LSTORE;
-import org.example.traceback.RestoreIpAddresses;
-
-import javax.security.auth.callback.CallbackHandler;
-import java.rmi.MarshalException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class MyBackTraceTest {
 
@@ -130,17 +125,18 @@ public class MyBackTraceTest {
             return result;
         }
         char[] cs = str.toCharArray();
-        char[] path = new char[str.length()];
+        StringBuilder path = new StringBuilder();
         boolean[] used = new boolean[cs.length];
+        Arrays.sort(cs);
 
         PermutationBackTrace(cs, used, 0, path, result);
 
         return result;
     }
 
-    private void PermutationBackTrace(char[] cs, boolean[] used, int step, char[] path, ArrayList<String> result) {
+    private void PermutationBackTrace(char[] cs, boolean[] used, int step, StringBuilder path, ArrayList<String> result) {
         if(step==cs.length) {
-            result.add(String.valueOf(path));
+            result.add(path.toString().trim());
             return;
         }
 
@@ -152,12 +148,11 @@ public class MyBackTraceTest {
                 continue;
             }
 
-            path[step] = cs[i];
+            path.append(cs[i]);
             used[i] = true;
             PermutationBackTrace(cs, used, step+1, path, result);
+            path.deleteCharAt(path.length()-1);
             used[i] = false;
-            String s = String.valueOf(path);
-            path = s.substring(0, s.length()-2).toCharArray();
         }
     }
 
@@ -257,6 +252,7 @@ public class MyBackTraceTest {
         if(leftUsed < n) {
             path[used] = '(';
             generateParenthesisBackTrace(n, used+1, leftUsed+1, rightUsed, path, result);
+            // 这个为什么没有撤回的代码呢原因
 
         }
         if(leftUsed > rightUsed && rightUsed < n) {
@@ -299,6 +295,7 @@ public class MyBackTraceTest {
                 int result = longestIncreasingPathBackTrace(matrix, visited, newi, newj, h, w, curLength+1);
                 maxLength = Math.max(maxLength, result);
             }
+            // 这儿为什么撤销的是这个呢
             visited[i][j] = false;
         }
 
