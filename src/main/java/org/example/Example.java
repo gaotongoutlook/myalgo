@@ -98,9 +98,11 @@ public class Example {
 
         // 目标和 添加加和减方式 让和为目标数字
         System.out.println("---------- 目标和 ----------");
-        nums = new int[]{2,7,9,13,27,31,37,3,2,3,5,7,11,13,17,19,23,29,47,53};
+        /*nums = new int[]{2,7,9,13,27,31,37,3,2,3,5,7,11,13,17,19,23,29,47,53};
+        target = 7;*/
+        nums = new int[]{1, 1, 1, 1, 1};
+        target = 3;
         Arrays.sort(nums);
-        target = 7;
         int res = example.findTargetSumWays1(nums, target);
         System.out.println("结果为: "+res);
     }
@@ -887,18 +889,82 @@ public class Example {
     private int findTargetSumWaysBacktrack1(int[] nums, int index, int sum, int target) {
         // 终止条件：处理完所有数字
         if(index == nums.length) {
+            System.out.println("----------------");
             return sum == target ? 1 : 0;
         }
 
         // 当前数字有两种选择：加号或减号
-        System.out.println("addWays: " + sum + " : " + nums[index] + " : " +(sum + nums[index]));
+        System.out.println("addWays: " + sum + " : " + nums[index] + " : " +(sum + nums[index]) + " : "+index);
         int addWays = findTargetSumWaysBacktrack1(nums, index + 1, sum + nums[index], target);
-        System.out.println("subtractWays: " + sum + " : " + nums[index] + " : " +(sum - nums[index]));
+        System.out.println("subtractWays: " + sum + " : " + nums[index] + " : " +(sum - nums[index]) + " : "+index);
         int subtractWays = findTargetSumWaysBacktrack1(nums, index + 1, sum - nums[index], target);
 
         return addWays + subtractWays;
     }
 
+    /**
+     * 不同路径III 1表示开始 2表示结束 0表示可走 -1表示障碍物
+     */
+    public int uniquePathsIII(int[][] grid) {
+        if(grid==null || grid.length==0 || grid[0].length==0) {
+            return 0;
+        }
+
+        int h = grid.length;
+        int w = grid[0].length;
+        int result = 0;
+        boolean[][] visited = new boolean[h][w];
+
+        // 找到1 和 找到2 当碰到-1时候，直接路径数清零 判断可行走的路径
+        int starti = 0;
+        int startj = 0;
+        int endi = 0;
+        int endj = 0;
+        for(int i=0; i<h; i++) {
+            for(int j=0; j<w; j++) {
+                if(grid[i][j] == 1) {
+                    starti = i;
+                    startj = j;
+                }
+                if(grid[i][j] == 2) {
+                    endi = i;
+                    endj = j;
+                }
+            }
+        }
+
+        result = uniquePathsIIIBackTrace(grid, visited, starti, startj, endi, endj, h, w, result);
+
+        return result;
+    }
+
+    private int uniquePathsIIIBackTrace(int[][] grid, boolean[][] visited, int starti, int startj, int endi, int endj, int h, int w, int result) {
+        visited[starti][startj] = true;
+
+        int curResult = result;
+
+        if(starti==startj && endi==endj) {
+            return curResult+1;
+        }
+
+        int[][] dur = new int[][]{{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        for(int[] d : dur) {
+            int newi = starti + d[0];
+            int newj = startj + d[1];
+            if(newi>=0 && newj<h && newj>=0 && newj<w && !visited[newi][newj]) {
+                if(grid[newi][newj]==-1) {
+                    return 0;
+                }
+                if(grid[newi][newj]==0) {
+                    uniquePathsIIIBackTrace(grid, visited, newi, newj, endi, endj, h, w, result);
+                }
+            }
+            visited[starti][startj] = false;
+        }
+
+
+        return curResult;
+    }
 
 
 }
