@@ -1,14 +1,24 @@
 package org.example;
 
+import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller;
+import com.sun.javafx.collections.FloatArraySyncer;
+import com.sun.javafx.tk.RenderJob;
+import com.sun.prism.ReadbackRenderTarget;
 import jdk.nashorn.internal.runtime.linker.NashornGuards;
 import org.example.dfs.MyGraph;
+import org.example.pojo.Interval;
+import org.example.pojo.ListNode;
 import org.example.pojo.TreeNode;
 import org.example.utils.PrintUtils;
 
+import java.awt.*;
 import java.awt.font.NumericShaper;
 import java.net.NetworkInterface;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BinaryOperator;
 
 public class Test {
@@ -79,7 +89,7 @@ public class Test {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main1(String[] args) {
         int[] nums = new int[]{2, 3, 6, 7};
         int target = 9;
         List<List<Integer>> result = new Test().selectOnce(nums, target);
@@ -760,5 +770,585 @@ public class Test {
 
         return Collections.emptyList();
     }
+
+    /**
+     * 合并区间
+     */
+    public ArrayList<Interval> merge (ArrayList<Interval> intervals) {
+        // 先做排序 之后在做别的 排序过程中进行合并
+        if (intervals == null || intervals.size() <= 1) {
+            return intervals;
+        }
+
+        // 按区间起始位置排序
+        intervals.sort((a, b) -> Integer.compare(a.start, b.start));
+
+        ArrayList<Interval> result = new ArrayList<>();
+
+        // 3. 遍历并合并区间
+        Interval current = intervals.get(0);
+        result.add(current);
+
+        for (int i = 1; i < intervals.size(); i++) {
+            Interval next = intervals.get(i);
+
+            // 如果当前区间与下一个区间有重叠
+            if(current.end >= next.start) {
+                current.end = Math.max(next.end, current.end);
+            } else {
+                // 没有重叠，开始处理下一个区间
+                current = next;
+                result.add(current);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 删除链表的倒数第N个节点
+     */
+    public ListNode removeNthFromEnd (ListNode head, int n) {
+        if(head == null || n<=0) {
+            return null;
+        }
+
+        int k = 0;
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode pre = dummy;
+        ListNode cur = dummy.next;
+        // 先看看有多少个节点
+        while(cur!=null) {
+            cur = cur.next;
+            k++;
+        }
+        if(k < n) {
+            return dummy.next;
+        }
+        if(k == n) {
+            dummy.next = head.next;
+            return dummy.next;
+        }
+
+        // 存在n比链表长度长 等于链表长度 小于链表长度 记录前一个链表节点
+        int temp = k-n; // 此处注意，下边是大于1还是大于0 k-n+1 是第几个节点，从1开始 注意下标从0开始
+        cur = dummy.next;
+        while(temp>0 && cur!=null) {
+            pre = cur;
+            cur = cur.next;
+            temp--;
+        }
+
+        // 删除这个节点
+        pre.next = cur.next;
+
+        return dummy.next;
+    }
+
+    /**
+     * 比较版本号
+     */
+    public int compare (String version1, String version2) {
+        if(version1==null && version2==null) {
+            return 0;
+        }
+        if(version1==null || version2==null) {
+            return version1==null ? 1 : 1;
+        }
+
+        // 将两个版本号分割成两个列表或者数组，之后做比对
+        String[] v1Arr = version1.split("\\.");
+        String[] v2Arr = version2.split("\\.");
+        int v1Len = v1Arr.length;
+        int v2Len = v2Arr.length;
+
+        // 长度相同 和 长度不同
+        for(int i=0; i<Math.min(v1Len, v2Len); i++) {
+            int num1 = Integer.parseInt(v1Arr[i]);
+            int num2 = Integer.parseInt(v2Arr[i]);
+            if(num1 > num2) {
+                return 1;
+            } else if(num1 < num2) {
+                return -1;
+            }
+        }
+
+        // 需要判断后续剩余的是不是都为0
+        if(v1Len < v2Len) {
+            for(int i=v1Len; i<v2Len; i++) {
+                int num = Integer.parseInt(v2Arr[i]);
+                if(num!=0) {
+                    return -1;
+                }
+            }
+        } else {
+            for(int i=v2Len; i<v1Len; i++) {
+                int num = Integer.parseInt(v1Arr[i]);
+                if(num!=0) {
+                    return 1;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    /**
+     * 合并二叉树
+     */
+    public TreeNode mergeTrees (TreeNode t1, TreeNode t2) {
+        if(t1==null && t2==null) {
+            return null;
+        }
+        if(t1==null || t2==null) {
+            return t1==null ? t2 : t1;
+        }
+        return buildTreeNode(t1, t2);
+    }
+
+    private TreeNode buildTreeNode(TreeNode t1, TreeNode t2) {
+        // 终止条件
+        if(t1==null) {
+            return t2;
+        }
+        if(t2==null) {
+            return t1;
+        }
+
+        TreeNode root = new TreeNode(t1.val + t2.val);
+        root.left = buildTreeNode(t1.left, t2.left);
+        root.right = buildTreeNode(t1.right, t2.right);
+        return root;
+    }
+
+    public TreeNode mergeTrees1 (TreeNode t1, TreeNode t2) {
+        // 终止条件
+        if (t1 == null) {
+            return t2;
+        }
+        if (t2 == null) {
+            return t1;
+        }
+
+        TreeNode root = new TreeNode(t1.val + t2.val);
+        root.left = mergeTrees1(t1.left, t2.left);
+        root.right = mergeTrees1(t1.right, t2.right);
+
+        return root;
+    }
+
+    /**
+     * 原地合并，修改 t1
+     */
+    public TreeNode mergeTrees2(TreeNode t1, TreeNode t2) {
+        // 如果 t1 为空，返回 t2
+        if (t1 == null) {
+            return t2;
+        }
+        // 如果 t2 为空，直接返回 t1
+        if (t2 == null) {
+            return t1;
+        }
+
+        // 合并当前节点值
+        t1.val += t2.val;
+
+        // 递归合并左右子树
+        t1.left = mergeTrees(t1.left, t2.left);
+        t1.right = mergeTrees(t1.right, t2.right);
+
+        return t1;
+    }
+
+    /**
+     * 使用队列实现广度优先合并
+     */
+    public TreeNode mergeTrees3(TreeNode t1, TreeNode t2) {
+        if (t1 == null) {
+            return t2;
+        }
+        if (t2 == null) {
+            return t1;
+        }
+
+        Queue<TreeNode[]> queue = new LinkedList<>();
+        queue.offer(new TreeNode[]{t1, t2});
+
+        while (!queue.isEmpty()) {
+            TreeNode[] nodes = queue.poll();
+            TreeNode node1 = nodes[0];
+            TreeNode node2 = nodes[1];
+
+            // 合并当前节点值
+            node1.val += node2.val;
+
+            // 处理左子树
+            if (node1.left != null && node2.left != null) {
+                queue.offer(new TreeNode[]{node1.left, node2.left});
+            } else if (node1.left == null) {
+                node1.left = node2.left;
+            }
+            // 如果 node1.left 不为空但 node2.left 为空，什么都不做
+
+            // 处理右子树
+            if (node1.right != null && node2.right != null) {
+                queue.offer(new TreeNode[]{node1.right, node2.right});
+            } else if (node1.right == null) {
+                node1.right = node2.right;
+            }
+        }
+
+        return t1;
+    }
+
+    /**
+     * 两数之和
+     */
+    public int[] twoSum (int[] numbers, int target) {
+        Map<Integer,Integer> map = new HashMap<>();
+
+        for(int i=0; i<numbers.length; i++) {
+            if(map.containsKey(numbers[i])) {
+                return new int[]{map.get(numbers[i])+1, i+1};
+            }
+            map.put(target-numbers[i], i);
+        }
+
+        return new int[]{};
+    }
+
+    /**
+     * 三数之和
+     */
+    public ArrayList<ArrayList<Integer>> threeSum (int[] num) {
+        if(num==null || num.length<=2) {
+            return new ArrayList<>();
+        }
+
+        Map<Integer, int[]> map = new HashMap<>();
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+
+        // 怎么转换为两束之和 同时怎么去重
+        for(int i=0; i<num.length; i++) {
+            if (i > 0 && num[i] == num[i - 1]) {
+                continue;
+            }
+
+            // 返回下标，方便后续操作
+            ArrayList<Integer> list = twoSum(num, -num[i], i);
+
+            // 没有匹配的结果
+            if(list.size()==0) {
+                continue;
+            }
+            // 存在匹配的结果，但是这两个值已经引用过了
+            if(list.size()==2 && map.containsKey(i) && list.contains(map.get(i)[0]) && list.contains(map.get(i)[1])) {
+                continue;
+            }
+
+            int a = list.get(0);
+            int b = list.get(1);
+            ArrayList<Integer> r = new ArrayList<>();
+            r.add(num[a]);
+            r.add(num[b]);
+            r.add(num[i]);
+            result.add(r);
+
+            map.put(a, new int[]{i, b});
+            map.put(b, new int[]{i, a});
+        }
+
+        return result;
+    }
+
+    public ArrayList<Integer> twoSum (int[] numbers, int target, int except) {
+        ArrayList<Integer> result = new ArrayList<>();
+        Map<Integer,Integer> map = new HashMap<>();
+
+        for(int i=0; i<numbers.length; i++) {
+            if(i==except) {
+               continue;
+            }
+            if(map.containsKey(numbers[i])) {
+                result.add(map.get(numbers[i]));
+                result.add(i);
+                break;
+            }
+            map.put(target-numbers[i], i);
+        }
+
+        return result;
+    }
+
+
+    /**
+     * 使用双指针的方式方法
+     */
+    public ArrayList<ArrayList<Integer>> threeSum1(int[] num) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+
+        // 边界条件处理
+        if (num == null || num.length < 3) {
+            return result;
+        }
+
+        // 1. 先排序
+        Arrays.sort(num);
+        int n = num.length;
+
+        // 2. 遍历数组
+        for (int i = 0; i < n - 2; i++) {
+            // 跳过重复的元素（避免重复的三元组）
+            if (i > 0 && num[i] == num[i - 1]) {
+                continue;
+            }
+
+            // 如果当前最小值已经大于0，不可能有三数之和为0
+            if (num[i] > 0) {
+                break;
+            }
+
+            // 使用双指针查找另外两个数
+            int left = i + 1;
+            int right = n - 1;
+
+            while (left < right) {
+                int sum = num[i] + num[left] + num[right];
+
+                if (sum == 0) {
+                    // 找到满足条件的三元组
+                    ArrayList<Integer> triplet = new ArrayList<>();
+                    triplet.add(num[i]);
+                    triplet.add(num[left]);
+                    triplet.add(num[right]);
+                    result.add(triplet);
+
+                    // 跳过重复的左指针元素
+                    while (left < right && num[left] == num[left + 1]) {
+                        left++;
+                    }
+                    // 跳过重复的右指针元素
+                    while (left < right && num[right] == num[right - 1]) {
+                        right--;
+                    }
+
+                    // 移动指针
+                    left++;
+                    right--;
+                } else if (sum < 0) {
+                    // 和太小，左指针右移
+                    left++;
+                } else {
+                    // 和太大，右指针左移
+                    right--;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * N数之和
+     */
+    private ArrayList<ArrayList<Integer>> nSum(int[] nums, int target, int n, int start) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+
+        // 边界条件
+        if (n < 2 || nums.length < n) {
+            return result;
+        }
+
+        // 两数之和的情况
+        if (n == 2) {
+            int left = start;
+            int right = nums.length - 1;
+
+            while (left < right) {
+                int sum = nums[left] + nums[right];
+
+                if (sum == target) {
+                    ArrayList<Integer> pair = new ArrayList<>();
+                    pair.add(nums[left]);
+                    pair.add(nums[right]);
+                    result.add(pair);
+
+                    // 跳过重复元素
+                    while (left < right && nums[left] == nums[left + 1]) left++;
+                    while (left < right && nums[right] == nums[right - 1]) right--;
+
+                    left++;
+                    right--;
+                } else if (sum < target) {
+                    left++;
+                } else {
+                    right--;
+                }
+            }
+        } else {
+            // 递归处理 n > 2 的情况
+            for (int i = start; i < nums.length - n + 1; i++) {
+                // 跳过重复元素
+                if (i > start && nums[i] == nums[i - 1]) {
+                    continue;
+                }
+
+                // 递归调用
+                ArrayList<ArrayList<Integer>> subResult = nSum(nums, target - nums[i], n - 1, i + 1);
+
+                // 添加当前元素到结果中
+                for (ArrayList<Integer> list : subResult) {
+                    list.add(0, nums[i]); // 在开头添加当前元素
+                    result.add(list);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * 三数之和
+     */
+    public ArrayList<ArrayList<Integer>> threeSum2(int[] num) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+
+        if (num == null || num.length < 3) {
+            return result;
+        }
+
+        Arrays.sort(num);
+        int n = num.length;
+
+        for (int i = 0; i < n - 2; i++) {
+            // 跳过重复元素
+            if (i > 0 && num[i] == num[i - 1]) {
+                continue;
+            }
+
+            // 使用Map存储需要查找的补数
+            Map<Integer, Integer> map = new HashMap<>();
+
+            for (int j = i + 1; j < n; j++) {
+                int complement = -num[i] - num[j];
+
+                if (map.containsKey(complement)) {
+                    ArrayList<Integer> triplet = new ArrayList<>();
+                    triplet.add(num[i]);
+                    triplet.add(complement);
+                    triplet.add(num[j]);
+
+                    // 确保不添加重复的三元组
+                    if (!containsTriplet(result, triplet)) {
+                        result.add(triplet);
+                    }
+                }
+
+                map.put(num[j], j);
+            }
+        }
+
+        return result;
+    }
+
+    // 检查是否已经包含该三元组
+    private boolean containsTriplet(ArrayList<ArrayList<Integer>> result,
+                                    ArrayList<Integer> triplet) {
+        for (ArrayList<Integer> list : result) {
+            if (list.get(0).equals(triplet.get(0)) &&
+                    list.get(1).equals(triplet.get(1)) &&
+                    list.get(2).equals(triplet.get(2))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 滑动窗口的最大值
+     */
+    public ArrayList<Integer> maxInWindows (int[] num, int size) {
+        return null;
+    }
+
+    /**
+     * 在二叉树中找到两个节点的最近公共祖先
+     */
+    public int lowestCommonAncestor(TreeNode root, int o1, int o2) {
+        TreeNode result = findLCA(root, o1, o2);
+        return result.val;
+    }
+
+    /**
+     * 递归查找LCA
+     * 返回找到的LCA节点，如果没找到但找到了o1或o2，返回对应的节点
+     */
+    private TreeNode findLCA(TreeNode root, int o1, int o2) {
+        // 基本情况
+        if (root == null || root.val == o1 || root.val == o2) {
+            return root;
+        }
+
+        // 在左子树中查找
+        TreeNode left = findLCA(root.left, o1, o2);
+        // 在右子树中查找
+        TreeNode right = findLCA(root.right, o1, o2);
+
+        // 情况1：左右子树各找到一个节点，当前节点就是LCA
+        if (left != null && right != null) {
+            return root;
+        }
+
+        // 情况2：只在左子树找到，返回左子树的结果
+        if (left != null) {
+            return left;
+        }
+
+        // 情况3：只在右子树找到，返回右子树的结果
+        if (right != null) {
+            return right;
+        }
+
+        // 情况4：两个都没找到
+        return null;
+    }
+
+    /**
+     * 序列化与反序列化
+     * @param root
+     * @return
+     */
+    String Serialize(TreeNode root) {
+        // 先确定多少层
+
+
+        // 之后根据层数做序列化
+
+
+        return null;
+    }
+    TreeNode Deserialize(String str) {
+        return null;
+    }
+
+    /**
+     * 机器人的运动范围
+     * 颜色填充
+     * 节点的通路 无
+     * 岛屿数量
+     * 水域大小
+     * 课程表
+     * 单词搜索
+     * 跳跃游戏III
+     * 打开转盘锁 无
+     *
+     * 单词转换
+     * 婴儿名字
+     * 扫雷游戏
+     * 单词接龙
+     * 单词接龙II
+     */
+
 
 }

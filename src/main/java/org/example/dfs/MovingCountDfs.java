@@ -1,7 +1,7 @@
 package org.example.dfs;
 
 /**
- * 二维矩阵搜索或遍历
+ * 二维矩阵搜索或遍历 机器人的运动范围 k为限制数 机器人不能走入和大于k的表格（两个坐标和）
  */
 public class MovingCountDfs {
 
