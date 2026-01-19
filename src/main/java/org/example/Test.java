@@ -5,7 +5,11 @@ import org.example.pojo.Interval;
 import org.example.pojo.ListNode;
 import org.example.pojo.MyPosi;
 import org.example.pojo.TreeNode;
+import org.example.traceback.RestoreIpAddresses;
 import org.example.utils.PrintUtils;
+import sun.awt.windows.WPrinterJob;
+
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
 
@@ -1254,13 +1258,6 @@ public class Test {
     }
 
     /**
-     * 滑动窗口的最大值
-     */
-    public ArrayList<Integer> maxInWindows (int[] num, int size) {
-        return null;
-    }
-
-    /**
      * 在二叉树中找到两个节点的最近公共祖先
      */
     public int lowestCommonAncestor(TreeNode root, int o1, int o2) {
@@ -1392,61 +1389,239 @@ public class Test {
      * 不同路径III 节点A到节点B，排除障碍，总共有多少种方法到达
      * https://leetcode.cn/problems/unique-paths-iii/?envType=problem-list-v2&envId=backtracking
      */
-    public int uniquePathsIII(int[][] grid) {
+    public int uniquePathsIII1(int[][] grid) {
         if(grid==null || grid.length==0 || grid[0].length==0) {
             return 0;
         }
 
         int h = grid.length;
         int w = grid[0].length;
+        // 可以访问到的节点个数
+        int emptyCount = 0;
+        int startX = -1;
+        int startY = -1;
         boolean[][] visited = new boolean[h][w];
         List<List<MyPosi>> result = new ArrayList<>();
         List<MyPosi> path = new ArrayList<>();
         // 首先找到开始的坐标
         for(int i=0; i<h; i++) {
             for(int j=0; j<w; j++) {
-                if(grid[i][j]==0) {
-                    uniquePathsIIIDfs(grid, visited, i, j, h, w, path, result);
-                    break;
+                if(grid[i][j]==1) {
+                    emptyCount++;
+                    startX = i;
+                    startY = j;
+                } else if(grid[i][j]==0 ||grid[i][j]==2) {
+                    emptyCount++;
                 }
             }
         }
 
+        uniquePathsIIIDfs(grid, visited, startX, startY, emptyCount, h, w, path, result);
+
         return result.size();
     }
 
-    private void uniquePathsIIIDfs(int[][] grid, boolean[][] visited, int i, int j, int h, int w, List<MyPosi> path, List<List<MyPosi>> result) {
+    private void uniquePathsIIIDfs(int[][] grid, boolean[][] visited, int i, int j, int emptyCount, int h, int w, List<MyPosi> path, List<List<MyPosi>> result) {
         path.add(new MyPosi(i, j));
-        if(path.size() == h*w) {
+        if(path.size() == emptyCount-1) {
             return;
         }
         if(grid[i][j]==2) {
             result.add(new ArrayList<>(path));
+            path.remove(path.size()-1);
             return;
         }
-        visited[i][j] = true;
         if(grid[i][j]==-1) {
             return;
         }
+        visited[i][j] = true;
 
         int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         for(int[] di : dirs) {
             int newi = i + di[0];
             int newj = j + di[1];
             if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && grid[newi][newj]==0) {
-                uniquePathsIIIDfs(grid, visited, newi, newj, h, w, path, result);
+                uniquePathsIIIDfs(grid, visited, newi, newj, emptyCount, h, w, path, result);
             }
         }
 
-        // path.remove(path.size()-1);
+        path.remove(path.size()-1);
         visited[i][j] = false;
     }
 
-    public static void main(String[] args) {
+    public static void main3(String[] args) {
         int[][] grid = {{1,0,0,0}, {0,0,0,0}, {0,0,2,-1}};
         int result = new Test().uniquePathsIII(grid);
         System.out.println(result);
     }
 
+    public int uniquePathsIII(int[][] grid) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+
+        int h = grid.length;
+        int w = grid[0].length;
+        boolean[][] visited = new boolean[h][w];
+
+        // 找到起点并计算需要访问的总格子数
+        int startX = -1, startY = -1;
+        int emptyCount = 0;
+
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                if (grid[i][j] == 1) {
+                    startX = i;
+                    startY = j;
+                    emptyCount++;
+                } else if (grid[i][j] == 0 || grid[i][j] == 2) {
+                    emptyCount++;
+                }
+            }
+        }
+
+        List<List<MyPosi>> result = new ArrayList<>();
+        List<MyPosi> path = new ArrayList<>();
+        dfsWithPath(grid, visited, startX, startY, emptyCount, 0, path, result);
+
+        return result.size();
+    }
+
+    private void dfsWithPath(int[][] grid, boolean[][] visited, int i, int j,
+                             int total, int count, List<MyPosi> path,
+                             List<List<MyPosi>> result) {
+        if (i < 0 || i >= grid.length || j < 0 || j >= grid[0].length ||
+                visited[i][j] || grid[i][j] == -1) {
+            return;
+        }
+
+        path.add(new MyPosi(i, j));
+
+        if (grid[i][j] == 2) {
+            if (count + 1 == total) {
+                result.add(new ArrayList<>(path));
+            }
+            path.remove(path.size() - 1);
+            return;
+        }
+
+        visited[i][j] = true;
+
+        dfsWithPath(grid, visited, i - 1, j, total, count + 1, path, result);
+        dfsWithPath(grid, visited, i + 1, j, total, count + 1, path, result);
+        dfsWithPath(grid, visited, i, j - 1, total, count + 1, path, result);
+        dfsWithPath(grid, visited, i, j + 1, total, count + 1, path, result);
+
+        visited[i][j] = false;
+        path.remove(path.size() - 1);
+    }
+
+    /**
+     * 三数之和
+     */
+    public ArrayList<ArrayList<Integer>> threeSum5 (int[] nums) {
+        ArrayList<ArrayList<Integer>> result = new ArrayList<>();
+        if(nums==null || nums.length<3) {
+            return result;
+        }
+
+        Arrays.sort(nums);
+        for(int i=0; i<nums.length-2; i++) {
+            // 当第一个指针指向的数字大于0时候，后边的数字肯定都大于0
+            if(nums[i] > 0) {
+                break;
+            }
+            // 跳过所有的重复值
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+
+            int left = i+1;
+            int right = nums.length-1;
+            while(left < right) {
+                int sum = nums[i] + nums[left] + nums[right];
+                if(sum==0) {
+                    ArrayList<Integer> list = new ArrayList<>();
+                    list.add(nums[i]);
+                    list.add(nums[left]);
+                    list.add(nums[right]);
+                    result.add(list);
+
+                    while(left<right && nums[left]==nums[left+1]) {
+                        left++;
+                    }
+                    while(left<right && nums[right]==nums[right-1]) {
+                        right--;
+                    }
+
+                    left++;
+                    right--;
+                }else if(sum < 0) {
+                    left++;
+                }else {
+                    right--;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = new int[]{-2,0,0,2,2};
+        ArrayList<ArrayList<Integer>> result = new Test().threeSum5(nums);
+        System.out.println(result.size());
+    }
+
+    /**
+     * 字符串的全排列
+     */
+    public ArrayList<String> Permutation (String str) {
+        ArrayList<String> result = new ArrayList<>();
+        if(str==null || str.length()==0) {
+            return result;
+        }
+        if(str.length()<2) {
+            result.add(str);
+            return result;
+        }
+
+        StringBuilder path = new StringBuilder();
+        char[] cs = str.toCharArray();
+        Arrays.sort(cs); // 注意排序
+        boolean[] used = new boolean[cs.length];
+        PermutationBackTrace(cs, used, 0, path, result);
+
+        return result;
+    }
+
+    private void PermutationBackTrace(char[] cs, boolean[] used, int step, StringBuilder path, ArrayList<String> result) {
+        if(step == cs.length) {
+            result.add(new String(path));
+            return;
+        }
+
+        for(int i=0; i<cs.length; i++) {
+            if(used[i]) {
+                continue;
+            }
+            if(i>0 && cs[i-1]==cs[i] && !used[i-1]) {
+                continue;
+            }
+            path.append(cs[i]);
+            used[i] = true;
+            PermutationBackTrace(cs, used, step+1, path, result);
+            path.deleteCharAt(path.length()-1);
+            used[i] = false;
+        }
+    }
+
+    /**
+     * 滑动窗口的最大值
+     */
+    public ArrayList<Integer> maxInWindows (int[] num, int size) {
+        // 单调栈
+        return null;
+    }
 
 }
