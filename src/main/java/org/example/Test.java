@@ -1,25 +1,13 @@
 package org.example;
 
-import com.sun.corba.se.spi.presentation.rmi.DynamicMethodMarshaller;
-import com.sun.javafx.collections.FloatArraySyncer;
-import com.sun.javafx.tk.RenderJob;
-import com.sun.prism.ReadbackRenderTarget;
-import jdk.nashorn.internal.runtime.linker.NashornGuards;
 import org.example.dfs.MyGraph;
 import org.example.pojo.Interval;
 import org.example.pojo.ListNode;
+import org.example.pojo.MyPosi;
 import org.example.pojo.TreeNode;
 import org.example.utils.PrintUtils;
-
-import java.awt.*;
-import java.awt.font.NumericShaper;
-import java.net.NetworkInterface;
-import java.sql.Array;
-import java.sql.ResultSet;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.function.BinaryOperator;
 
 public class Test {
 
@@ -1349,6 +1337,116 @@ public class Test {
      * 单词接龙
      * 单词接龙II
      */
+
+    /**
+     * 课程及其课程依赖
+     * [a, b] 如果学习a课程前必须学习课程b
+     */
+    public boolean course(int cources, int[][] depends) {
+        // 首先先列出该课程被哪些课程依赖
+        ArrayList<Integer>[] courseDependList = new ArrayList[cources];
+        for(int i=0; i<cources; i++) {
+            courseDependList[i] = new ArrayList<Integer>();
+        }
+
+        // 其次列出修当前课程需要依赖的课程数
+        int[] dependArr = new int[cources];
+        for(int i=0; i<cources; i++) {
+            int course = depends[i][0];
+            int dependCourse = depends[i][1];
+            courseDependList[dependCourse].add(course);
+            dependArr[course]++;
+        }
+
+        // 更具依赖关系，找出不需要依赖别的课程可修的课程，一次推理执行
+        LinkedList<Integer> queue = new LinkedList<>();
+        for(int i=0; i<dependArr.length; i++) {
+            int dependCourses = dependArr[i];
+            if(dependCourses==0) {
+                // 注意放入的顺序
+                queue.offer(i);
+            }
+        }
+
+        // 统计可以完成的课程数
+        int finishCourses = 0;
+        while(!queue.isEmpty()) {
+            int dependCourse = queue.remove();
+            // 总共修的课程数又增了一门
+            finishCourses++;
+            // 看看哪些课程依赖了本课程
+            ArrayList<Integer> dependList = courseDependList[dependCourse];
+            for(Integer course : dependList) {
+                // 依赖的课程少了一门
+                dependArr[course]--;
+                if(dependArr[course]==0) {
+                    queue.add(course);
+                }
+            }
+        }
+
+        return finishCourses==cources;
+    }
+
+    /**
+     * 不同路径III 节点A到节点B，排除障碍，总共有多少种方法到达
+     * https://leetcode.cn/problems/unique-paths-iii/?envType=problem-list-v2&envId=backtracking
+     */
+    public int uniquePathsIII(int[][] grid) {
+        if(grid==null || grid.length==0 || grid[0].length==0) {
+            return 0;
+        }
+
+        int h = grid.length;
+        int w = grid[0].length;
+        boolean[][] visited = new boolean[h][w];
+        List<List<MyPosi>> result = new ArrayList<>();
+        List<MyPosi> path = new ArrayList<>();
+        // 首先找到开始的坐标
+        for(int i=0; i<h; i++) {
+            for(int j=0; j<w; j++) {
+                if(grid[i][j]==0) {
+                    uniquePathsIIIDfs(grid, visited, i, j, h, w, path, result);
+                    break;
+                }
+            }
+        }
+
+        return result.size();
+    }
+
+    private void uniquePathsIIIDfs(int[][] grid, boolean[][] visited, int i, int j, int h, int w, List<MyPosi> path, List<List<MyPosi>> result) {
+        path.add(new MyPosi(i, j));
+        if(path.size() == h*w) {
+            return;
+        }
+        if(grid[i][j]==2) {
+            result.add(new ArrayList<>(path));
+            return;
+        }
+        visited[i][j] = true;
+        if(grid[i][j]==-1) {
+            return;
+        }
+
+        int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        for(int[] di : dirs) {
+            int newi = i + di[0];
+            int newj = j + di[1];
+            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && grid[newi][newj]==0) {
+                uniquePathsIIIDfs(grid, visited, newi, newj, h, w, path, result);
+            }
+        }
+
+        // path.remove(path.size()-1);
+        visited[i][j] = false;
+    }
+
+    public static void main(String[] args) {
+        int[][] grid = {{1,0,0,0}, {0,0,0,0}, {0,0,2,-1}};
+        int result = new Test().uniquePathsIII(grid);
+        System.out.println(result);
+    }
 
 
 }

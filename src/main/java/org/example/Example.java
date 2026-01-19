@@ -1,10 +1,16 @@
 package org.example;
 
+import com.sun.org.apache.bcel.internal.generic.LADD;
 import org.example.dfs.MyGraph;
 import org.example.pojo.TreeNode;
 import org.example.utils.PrintUtils;
+import sun.rmi.server.InactiveGroupException;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
+import java.util.concurrent.RecursiveTask;
+import java.util.zip.CheckedInputStream;
 
 
 public class Example {
@@ -962,8 +968,230 @@ public class Example {
             visited[starti][startj] = false;
         }
 
-
         return curResult;
+    }
+
+    /**
+     * 机器人的运动范围 机器人能到达多少个格子
+     */
+    public int movingCount(int m, int n, int k) {
+        boolean[][] visited = new boolean[m][n];
+        int result = 0;
+        movingCountDfs(m, n, k, visited, 0, 0, result);
+        return result;
+    }
+
+    private void movingCountDfs(int m, int n, int k, boolean[][] visited, int i, int j, int result) {
+        visited[i][j] = true;
+        result++;
+        int[][] durs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        for(int[] d : durs) {
+            int newi = i + d[0];
+            int newj = j + d[1];
+            if(newi>=0 && newi<m && newj>=0 && newj<n && !visited[newi][newj] && check(newi, newj, k)) {
+                movingCountDfs(m, n, k, visited, newi, newj, result);
+            }
+        }
+    }
+
+    private boolean check(int i, int j, int k) {
+        int sum = 0;
+        while(i != 0) {
+            sum += (i%10);
+            i /= 10;
+        }
+        while(j != 0) {
+            sum += (j%10);
+            j /= 10;
+        }
+        return sum <= k;
+    }
+
+    /**
+     * 颜色填充 把和原来颜色一致的填充成新颜色
+     */
+    public int[][] floodFill(int[][] images, int sr, int sc, int newColor) {
+        int m = images.length;
+        int n = images[0].length;
+        floodFillDfs(images, m, n, sr, sc, images[sr][sc], newColor);
+        return images;
+    }
+
+    private void floodFillDfs(int[][] images, int m, int n, int sr, int sc, int color, int newColor) {
+        images[sr][sc] = newColor;
+        int[][] dirs = {{-1, 0}, {1, 0}, {0, 1}, {0, -1}};
+        for(int[] d : dirs) {
+            int newi = sr + d[0];
+            int newj = sc + d[1];
+            if(newi>=0 && newi<m && newj>=0 && newj<n && images[newi][newj]==color) {
+                floodFillDfs(images, m, n, newi, newj, color, newColor);
+            }
+        }
+    }
+
+    /**
+     * 水域大小
+     */
+    public int[] pondSizes(int[][] land) {
+        int m = land.length;
+        int n = land[0].length;
+        // 统计水域的大小
+        int count = 0;
+        List<Integer> result = new ArrayList<>();
+        for(int i=0; i<m; i++) {
+            for (int j = 0; j < n; j++) {
+                if(land[i][j]==0) {
+                    count = 0;
+                    pondSizesDfs(land, i, j, m, n, count);
+                    result.add(count);
+                }
+            }
+        }
+
+        // 返回水域的个数以及水域的大小
+        int[] resultArr = new int[result.size()];
+        for(int i=0; i<result.size(); i++) {
+            resultArr[i] = result.get(i);
+        }
+        Arrays.sort(resultArr);
+        return resultArr;
+    }
+
+    private void pondSizesDfs(int[][] land, int curi, int curj, int m, int n, int count) {
+        // 每向外扩展一次 水域面积增加一
+        count++;
+        land[curi][curj] = 1;
+        int[][] dirs = {{-1, 0}, {1, 0}, {0, 1}, {0, -1},
+                {-1, -1}, {1, 1}, {-1, 1}, {1, -1}};
+        for(int[] d : dirs) {
+            int newi = curi + d[0];
+            int newj = curj + d[1];
+            if(newi>=0 && newi<n && newj>=0 && newj<m && land[newi][newj]==0) {
+                pondSizesDfs(land, newi, newj, m, n, count);
+            }
+        }
+    }
+
+    /**
+     * 课程是否可以完成
+     */
+    public boolean courseCanFinish(int numCourses, int[][] prerequisites) {
+        // 哪些课程依赖本课程完结才可以修
+        ArrayList<Integer>[] adjs = new ArrayList[numCourses];
+        for(int i=0; i<numCourses; i++) {
+            adjs[i] = new ArrayList<Integer>();
+        }
+
+        // 如果要修本课程需要依赖哪些课程数量
+        int[] indegrees = new int[numCourses];
+        for(int i=0; i<prerequisites.length; i++) {
+            // 当前需要修的课程 prerequisites[i][0]
+            // 当前课程需要依赖的课程 prerequisites[i][1]
+            // 列出当前课程被哪些课程依赖了
+            adjs[prerequisites[i][1]].add(prerequisites[i][0]);
+            // 修当前课程需要依赖的别的课程数量
+            indegrees[prerequisites[i][0]]++;
+        }
+
+        // 循环获取可以修的课程 没有依赖别的课程的课程 以及修完了所有依赖的课程的课程 可修集合
+        LinkedList<Integer> zeroInDegress = new LinkedList<>();
+        for(int i=0; i<indegrees.length; i++) {
+            // 可修课程
+            if(indegrees[i] == 0) {
+                zeroInDegress.offer(i);
+            }
+        }
+
+        // 已修课程总数
+        int zeroInDegreesCount = 0;
+        while(!zeroInDegress.isEmpty()) {
+            // 目前已经没有了依赖的课程
+            int coursei = zeroInDegress.remove();
+            zeroInDegreesCount++;
+            // 获取依赖当前课程的别的课程的集合
+            for(Integer coursej : adjs[coursei]) {
+                indegrees[coursej]--;
+                // 别的依赖课程都修完了 当前课程也可以修
+                if(indegrees[coursej] == 0) {
+                    zeroInDegress.add(coursej);
+                }
+            }
+        }
+
+        return zeroInDegreesCount == numCourses;
+    }
+
+    /**
+     * 跳跃游戏III 是否可达
+     */
+    public boolean canReach(int[] arr, int start) {
+        int n = arr.length;
+        boolean[] visited = new boolean[arr.length];
+        boolean reached = false;
+        canReachDfs(arr, start, visited, reached);
+        return reached;
+    }
+
+    private void canReachDfs(int[] arr, int cur, boolean[] visited, boolean reached) {
+        if(reached) {
+            return;
+        }
+        if(arr[cur]==0) {
+            reached = true;
+            return;
+        }
+        visited[cur] = true;
+        int left = cur - arr[cur];
+        if(left>=0 && left<arr.length && !visited[left]) {
+            canReachDfs(arr, left, visited, reached);
+        }
+        int right = cur + arr[cur];
+        if(right>=0 && right<arr.length && !visited[right]) {
+            canReachDfs(arr, right, visited, reached);
+        }
+    }
+
+    /**
+     * 单词搜索
+     */
+    public boolean searchLetter(char[][] board, String word) {
+        int h = board.length;
+        int w = board[0].length;
+        boolean existed = false;
+        for(int i=0; i<h; i++) {
+            for(int j=0; j<w; j++) {
+                boolean[][] visited = new boolean[h][w];
+                searchLetterDfs(board, word, visited, existed, i, j, 0, h, w);
+                if(existed) {
+                    break;
+                }
+            }
+        }
+        return existed;
+    }
+
+    private void searchLetterDfs(char[][] board, String word, boolean[][] visited, boolean existed, int i, int j, int k, int h, int w) {
+        if(existed) {
+            return;
+        }
+        // 提前失败 当前格子的字母不等于匹配单词的对应字母
+        if(word.charAt(k) != board[i][j]) {
+            return;
+        }
+        visited[i][j] = true;
+        if(k==word.length()-1) {
+            existed = true;
+            return;
+        }
+        int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+        for(int[] di : dirs) {
+            int newi = i + di[0];
+            int newj = j + di[1];
+            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj]) {
+                searchLetterDfs(board, word, visited, existed, newi, newj, k, h, w);
+            }
+        }
+        visited[i][j] = false;
     }
 
 
