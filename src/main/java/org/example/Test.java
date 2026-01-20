@@ -5,13 +5,9 @@ import org.example.pojo.Interval;
 import org.example.pojo.ListNode;
 import org.example.pojo.MyPosi;
 import org.example.pojo.TreeNode;
-import org.example.traceback.RestoreIpAddresses;
 import org.example.utils.PrintUtils;
-import sun.awt.windows.WPrinterJob;
 
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.List;
 
 public class Test {
 
@@ -30,21 +26,21 @@ public class Test {
     // path 路径
     private void selectOnceBackTrace(int[] nums, int k, int sum, int target, List<Integer> path, List<List<Integer>> result) {
         // 结束条件
-        if(k == nums.length) {
-            if(sum==target) {
+        if (k == nums.length) {
+            if (sum == target) {
                 result.add(new ArrayList<>(path));
             }
             return;
         }
         // 不做选择
-        selectOnceBackTrace(nums, k+1, sum, target, path, result);
+        selectOnceBackTrace(nums, k + 1, sum, target, path, result);
 
         // 选择
         path.add(nums[k]);
         // 回溯
-        selectOnceBackTrace(nums, k+1, sum+nums[k], target, path, result);
+        selectOnceBackTrace(nums, k + 1, sum + nums[k], target, path, result);
         // 撤销选择
-        path.remove(path.size()-1);
+        path.remove(path.size() - 1);
     }
 
 
@@ -63,21 +59,21 @@ public class Test {
     // path 路径
     private void selectOnceRepeatBackTrace(int[] nums, int k, int sum, int target, List<Integer> path, List<List<Integer>> result) {
         // 结束条件 当都必须选择的时候，就不存在阶段信息了
-        if(sum==target) {
+        if (sum == target) {
             result.add(new ArrayList<>(path));
             return;
         }
 
-        for(int i=k; i<nums.length; i++) {
-            if(sum + nums[i] > target) { // 剪枝
+        for (int i = k; i < nums.length; i++) {
+            if (sum + nums[i] > target) { // 剪枝
                 break;
             }
             //  选择
             path.add(nums[i]);
             // 回溯 可能重复选择多次，所以阶段也会重复多次
-            selectOnceRepeatBackTrace(nums, i, sum+nums[i], target, path, result);
+            selectOnceRepeatBackTrace(nums, i, sum + nums[i], target, path, result);
             // 撤销选择
-            path.remove(path.size()-1);
+            path.remove(path.size() - 1);
         }
     }
 
@@ -100,19 +96,19 @@ public class Test {
         PrintUtils.printString(result);
 
         System.out.println();
-        nums = new int[]{1,2,3};
+        nums = new int[]{1, 2, 3};
         result.clear();
         result = new Test().subSets(nums);
         PrintUtils.printString(result);
 
         System.out.println();
-        nums = new int[]{1,2,2};
+        nums = new int[]{1, 2, 2};
         result.clear();
         result = new Test().subSetsWithDup(nums);
         PrintUtils.printString(result);
 
         System.out.println();
-        nums = new int[]{1,2,2};
+        nums = new int[]{1, 2, 2};
         result.clear();
         result = new Test().subSetsWithDup1(nums);
         PrintUtils.printString(result);
@@ -125,25 +121,25 @@ public class Test {
         List<List<Integer>> result = new ArrayList<>();
         List<Integer> path = new ArrayList<>();
         int[] nums = new int[n];
-        for(int i=0; i<n; i++) {
-            nums[i] = i+1;
+        for (int i = 0; i < n; i++) {
+            nums[i] = i + 1;
         }
         testplzhbacktrace(nums, 0, 0, k, path, result);
         return result;
     }
 
     private void testplzhbacktrace(int[] nums, int start, int step, int k, List<Integer> path, List<List<Integer>> result) {
-        if(k == path.size()) {
+        if (k == path.size()) {
             result.add(new ArrayList<>(path));
             return;
         }
-        for(int i=start; i<nums.length; i++) {
-            if(path.contains(nums[i])) {
+        for (int i = start; i < nums.length; i++) {
+            if (path.contains(nums[i])) {
                 continue;
             }
             path.add(nums[i]);
-            testplzhbacktrace(nums, i+1, step+1, k, path, result);
-            path.remove(path.size()-1);
+            testplzhbacktrace(nums, i + 1, step + 1, k, path, result);
+            path.remove(path.size() - 1);
         }
     }
 
@@ -155,23 +151,23 @@ public class Test {
     }
 
     private void subSetsBackTrace(int[] nums, int start, int step, List<Integer> path, List<List<Integer>> result) {
-        if(nums.length == step) {
+        if (nums.length == step) {
             result.add(new ArrayList<>(path));
             return;
         }
 
-        for(int i=start; i<nums.length; i++) {
+        for (int i = start; i < nums.length; i++) {
             // 不选择
-            subSetsBackTrace(nums, i+1,step+1, path, result);
-            if(path.contains(nums[i])) { // 剪枝
+            subSetsBackTrace(nums, i + 1, step + 1, path, result);
+            if (path.contains(nums[i])) { // 剪枝
                 continue;
             }
             // 选择
             path.add(nums[i]);
-             // 回溯
-            subSetsBackTrace(nums, i+1,step+1, path, result);
+            // 回溯
+            subSetsBackTrace(nums, i + 1, step + 1, path, result);
             // 撤销选择
-            path.remove(path.size()-1);
+            path.remove(path.size() - 1);
         }
     }
 
@@ -184,19 +180,19 @@ public class Test {
     }
 
     private void subSetsWithDupBackTrace1(int[] nums, int start, int step, List<Integer> path, List<List<Integer>> result) {
-        if(nums.length == step) {
+        if (nums.length == step) {
             result.add(new ArrayList<>(path));
             return;
         }
 
         Set<Integer> visited = new HashSet<>();
-        for(int i=start; i<nums.length; i++) {
+        for (int i = start; i < nums.length; i++) {
             if (i > start && nums[i] == nums[i - 1]) {
                 continue;
             }
 
             // 不选择
-            subSetsWithDupBackTrace1(nums, i+1,step+1, path, result);
+            subSetsWithDupBackTrace1(nums, i + 1, step + 1, path, result);
             /*if(path.contains(nums[i])) { // 剪枝
                 continue;
             }*/
@@ -210,9 +206,9 @@ public class Test {
             // 选择
             path.add(nums[i]);
             // 回溯
-            subSetsWithDupBackTrace1(nums, i+1,step+1, path, result);
+            subSetsWithDupBackTrace1(nums, i + 1, step + 1, path, result);
             // 撤销选择
-            path.remove(path.size()-1);
+            path.remove(path.size() - 1);
         }
     }
 
@@ -246,9 +242,6 @@ public class Test {
     }
 
 
-
-
-
     private void backtrackBinarySearch(int[] nums, int step, List<Integer> path, List<List<Integer>> result) {
         // 到达决策树的叶子节点
         if (step == nums.length) {
@@ -274,7 +267,7 @@ public class Test {
     }
 
     public List<List<Integer>> mytest() {
-        int[] nums = new int[]{1,2,2};
+        int[] nums = new int[]{1, 2, 2};
         List<List<Integer>> result = new ArrayList<>();
         List<Integer> path = new ArrayList<>();
         backtrackStandard(nums, 0, path, result);
@@ -284,7 +277,7 @@ public class Test {
 
         result.clear();
         path.clear();
-        nums = new int[]{1,2,3};
+        nums = new int[]{1, 2, 3};
         backtrackStandard(nums, 0, path, result);
         PrintUtils.printString(result);
 
@@ -298,7 +291,7 @@ public class Test {
         result.clear();
         path.clear();
         System.out.println();
-        nums = new int[]{1,1,2};
+        nums = new int[]{1, 1, 2};
         Arrays.sort(nums);
         permute(nums);
         //PrintUtils.printString(result);
@@ -336,17 +329,17 @@ public class Test {
     }
 
     private void permuteBackTrace(int[] nums, int step, List<Integer> path, List<List<Integer>> result) {
-        if(path.size() == nums.length) {
+        if (path.size() == nums.length) {
             result.add(new ArrayList<>(path));
             return;
         }
 
         for (int i = 0; i < nums.length; i++) {
-            if(path.contains(nums[i])) {
+            if (path.contains(nums[i])) {
                 continue;
             }
             // 去重条件（对于重复元素）
-            if (i > 0 && nums[i] == nums[i - 1] && !path.contains(nums[i-1])) {
+            if (i > 0 && nums[i] == nums[i - 1] && !path.contains(nums[i - 1])) {
                 continue;
             }
 
@@ -354,7 +347,7 @@ public class Test {
             path.add(nums[i]);
 
             // 递归到下一层
-            permuteBackTrace(nums, step+1, path, result);
+            permuteBackTrace(nums, step + 1, path, result);
 
             // 撤销选择
             path.remove(path.size() - 1);
@@ -365,7 +358,7 @@ public class Test {
      * 岛屿数量
      */
     public int numIslands(char[][] grid) {
-        if(grid==null || grid.length==0 || grid[0].length==0) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
             return 0;
         }
 
@@ -373,15 +366,15 @@ public class Test {
         int h = grid.length;
         int w = grid[0].length;
         boolean[][] visited = new boolean[h][w];
-        for(int i=0; i<h; i++) {
-            for(int j=0; j<w; j++) {
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
                 visited[i][j] = false;
             }
         }
 
-        for(int i=0; i<h; i++) {
+        for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
-                if(!visited[i][j] && grid[i][j] == 1) {
+                if (!visited[i][j] && grid[i][j] == 1) {
                     numIslandsDfs(grid, visited, 0, 0, h, w);
                 }
             }
@@ -396,10 +389,10 @@ public class Test {
         int newi = 0;
         int newj = 0;
         visited[i][j] = true;
-        for(int[] d : directions) {
+        for (int[] d : directions) {
             newi = i + d[0];
             newj = j + d[1];
-            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && grid[newi][newj]==1) {
+            if (newi >= 0 && newi < h && newj >= 0 && newj < w && !visited[newi][newj] && grid[newi][newj] == 1) {
                 numIslandsDfs(grid, visited, newi, newj, h, w);
             }
         }
@@ -409,27 +402,27 @@ public class Test {
      * 括号生成
      */
     public List<String> generateParenthesis(int n) {
-        if(n <= 0) {
+        if (n <= 0) {
             return Collections.emptyList();
         }
         List<String> result = new ArrayList<>();
-        char[] path = new char[2*n];
+        char[] path = new char[2 * n];
         generateParenthesisBackTrace(n, 0, 0, 0, path, result);
         return result;
     }
 
     private void generateParenthesisBackTrace(int n, int used, int leftUsed, int rightUsed, char[] path, List<String> result) {
-        if(used == 2*n) {
+        if (used == 2 * n) {
             result.add(String.valueOf(path));
             return;
         }
-        if(leftUsed < n) {
+        if (leftUsed < n) {
             path[used] = '(';
-            generateParenthesisBackTrace(n, used+1, leftUsed+1, rightUsed, path, result);
+            generateParenthesisBackTrace(n, used + 1, leftUsed + 1, rightUsed, path, result);
         }
-        if(leftUsed < rightUsed && rightUsed < n) {
+        if (leftUsed < rightUsed && rightUsed < n) {
             path[used] = ')';
-            generateParenthesisBackTrace(n, used+1, leftUsed, rightUsed+1, path, result);
+            generateParenthesisBackTrace(n, used + 1, leftUsed, rightUsed + 1, path, result);
         }
     }
 
@@ -437,7 +430,7 @@ public class Test {
      * 矩阵最长递增路径
      */
     public int longestIncreasingPath(int[][] matrix) {
-        if(matrix==null || matrix.length==0 || matrix[0].length==0) {
+        if (matrix == null || matrix.length == 0 || matrix[0].length == 0) {
             return 0;
         }
 
@@ -446,9 +439,9 @@ public class Test {
         int w = matrix[0].length;
         boolean[][] visited = new boolean[h][w];
 
-        for(int i=0; i<h; i++) {
-            for(int j=0; j<w; j++) {
-                if(visited[i][j]) {
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                if (visited[i][j]) {
                     int result = longestIncreasingPathBackTrace(matrix, visited, i, j, h, w, 1);
                     maxLength = Math.max(maxLength, result);
                 }
@@ -466,11 +459,11 @@ public class Test {
         int maxLength = currentLength;
         visited[i][j] = true;
 
-        for(int[] d : directions) {
+        for (int[] d : directions) {
             newi = i + d[0];
             newj = j + d[1];
-            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && matrix[newi][newj] > matrix[i][j]) {
-                int result = longestIncreasingPathBackTrace(matrix, visited, newi, newj, h, w, maxLength+1);
+            if (newi >= 0 && newi < h && newj >= 0 && newj < w && !visited[newi][newj] && matrix[newi][newj] > matrix[i][j]) {
+                int result = longestIncreasingPathBackTrace(matrix, visited, newi, newj, h, w, maxLength + 1);
                 maxLength = Math.max(result, maxLength);
             }
         }
@@ -484,15 +477,15 @@ public class Test {
      * N皇后
      */
     public List<char[][]> numberQueue(int n) {
-        if(n<=0) {
+        if (n <= 0) {
             return Collections.emptyList();
         }
 
         int row = 0;
         List<char[][]> result = new ArrayList<>();
         char[][] path = new char[n][n];
-        for(int i=0; i<n; i++) {
-            for(int j=0; j<n; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
                 path[i][j] = '*';
             }
         }
@@ -503,10 +496,10 @@ public class Test {
     }
 
     private void numberQueueBackTrace(int n, int row, char[][] path, List<char[][]> result) {
-        if(row == n) {
+        if (row == n) {
             char[][] snapshots = new char[n][n];
-            for(int i=0; i<n; i++) {
-                for(int j=0; j<n; j++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
                     snapshots[i][j] = path[i][j];
                 }
             }
@@ -514,11 +507,11 @@ public class Test {
             return;
         }
 
-        for(int i=row; i<n; i++) {
-            for(int j=0; j<n; j++) {
-                if(numberQueueIsOK(path, i, j, n)) {
+        for (int i = row; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (numberQueueIsOK(path, i, j, n)) {
                     path[i][j] = 'Q';
-                    numberQueueBackTrace(n, row+1, path, result);
+                    numberQueueBackTrace(n, row + 1, path, result);
                     path[i][j] = '*';
                 }
             }
@@ -529,17 +522,17 @@ public class Test {
         boolean flag = true;
 
         // 竖行不能有
-        for(int row=0; row<i; row++) {
-            if(path[row][j]=='Q') {
+        for (int row = 0; row < i; row++) {
+            if (path[row][j] == 'Q') {
                 return false;
             }
         }
 
         // 左上斜边不能有
-        int row = i-1;
-        int col = j-1;
-        while(row>=0 && col>=0) {
-            if(path[row][col]=='Q') {
+        int row = i - 1;
+        int col = j - 1;
+        while (row >= 0 && col >= 0) {
+            if (path[row][col] == 'Q') {
                 return false;
             }
             row--;
@@ -547,10 +540,10 @@ public class Test {
         }
 
         // 右上斜边不能有
-        row = i-1;
-        col = j+1;
-        while(row>=0 && col<n) {
-            if(path[row][col]=='Q') {
+        row = i - 1;
+        col = j + 1;
+        while (row >= 0 && col < n) {
+            if (path[row][col] == 'Q') {
                 return false;
             }
             row--;
@@ -573,13 +566,13 @@ public class Test {
         queue.add(startVertex);
         distance[startVertex] = 0;
 
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             Integer current = queue.poll();
-            for(Integer negi : graph.adjList[current]) {
-                if(!visited[negi]) {
+            for (Integer negi : graph.adjList[current]) {
+                if (!visited[negi]) {
                     queue.add(negi);
                     visited[negi] = true;
-                    distance[negi] = distance[current]+1;
+                    distance[negi] = distance[current] + 1;
                 }
             }
         }
@@ -595,8 +588,8 @@ public class Test {
 
     private static void dfsRecursiveDfs(MyGraph graph, boolean[] visited, int startVertex) {
         visited[startVertex] = true;
-        for(Integer neighbor : graph.adjList[startVertex]) {
-            if(!visited[neighbor]) {
+        for (Integer neighbor : graph.adjList[startVertex]) {
+            if (!visited[neighbor]) {
                 dfsRecursiveDfs(graph, visited, neighbor);
             }
         }
@@ -611,14 +604,14 @@ public class Test {
         Stack<Integer> stack = new Stack<>();
         stack.push(startVertex);
 
-        while(!stack.isEmpty()) {
+        while (!stack.isEmpty()) {
             Integer current = stack.pop();
             visited[current] = true;
 
             List<Integer> neighbors = graph.adjList[current];
             Collections.reverse(neighbors);
-            for(Integer neighbor : neighbors) {
-                if(!visited[neighbor]) {
+            for (Integer neighbor : neighbors) {
+                if (!visited[neighbor]) {
                     stack.push(neighbor);
                 }
             }
@@ -642,7 +635,7 @@ public class Test {
     }
 
     private int maxPathSumDfs(TreeNode root, int result) {
-        if(root==null) {
+        if (root == null) {
             return 0;
         }
 
@@ -651,13 +644,13 @@ public class Test {
 
         // 处理最大值
         int max = 0;
-        if(leftPath > 0) {
+        if (leftPath > 0) {
             max += leftPath;
         }
-        if(rightPath > 0) {
+        if (rightPath > 0) {
             max += rightPath;
         }
-        if(result < max) {
+        if (result < max) {
             result = max;
         }
 
@@ -674,13 +667,13 @@ public class Test {
     }
 
     private int diameterOfBinaryTreeBackTrace(TreeNode root, int result) {
-        if(root==null) {
+        if (root == null) {
             return 0;
         }
 
         int leftDepth = diameterOfBinaryTreeBackTrace(root.left, result);
         int rightDepth = diameterOfBinaryTreeBackTrace(root.right, result);
-        result = Math.max(result, leftDepth+rightDepth);
+        result = Math.max(result, leftDepth + rightDepth);
 
         return Math.max(leftDepth, rightDepth) + 1;
     }
@@ -696,20 +689,20 @@ public class Test {
     }
 
     private void pathSumBinaryTreeBackTrace(TreeNode root, int cur, int sum, List<Integer> path, List<List<Integer>> result) {
-        if(root.left==null && root.right==null) {
-            if(cur == sum) {
+        if (root.left == null && root.right == null) {
+            if (cur == sum) {
                 result.add(new ArrayList<>(path));
             }
             return;
         }
 
-        if(root.left != null) {
+        if (root.left != null) {
             path.add(root.left.val);
-            pathSumBinaryTreeBackTrace(root.left, cur+root.left.val, sum, path, result);
-            path.remove(path.size()-1);
+            pathSumBinaryTreeBackTrace(root.left, cur + root.left.val, sum, path, result);
+            path.remove(path.size() - 1);
         }
 
-        if(root.right != null) {
+        if (root.right != null) {
             path.add(root.right.val);
             pathSumBinaryTreeBackTrace(root.right, cur + root.right.val, sum, path, result);
             path.remove(path.size() - 1);
@@ -720,7 +713,7 @@ public class Test {
      * 查找从起点到目标的最短路径
      */
     public static List<Integer> bfsShortestPath1(MyGraph graph, int start, int target) {
-        if(start==target) {
+        if (start == target) {
             return Arrays.asList(start);
         }
 
@@ -734,16 +727,16 @@ public class Test {
 
         boolean found = false;
 
-        while(!queue.isEmpty() && !found) {
+        while (!queue.isEmpty() && !found) {
             Integer cur = queue.poll();
 
-            for(Integer neighbor : graph.adjList[cur]) {
-                if(!visited[neighbor]) {
+            for (Integer neighbor : graph.adjList[cur]) {
+                if (!visited[neighbor]) {
                     queue.add(neighbor);
                     visited[neighbor] = true;
                     parent[neighbor] = cur;
 
-                    if(neighbor == target) {
+                    if (neighbor == target) {
                         found = true;
                         break;
                     }
@@ -751,9 +744,9 @@ public class Test {
             }
         }
 
-        if(found) {
+        if (found) {
             List<Integer> path = new ArrayList<>();
-            for(Integer at = target; at != -1; at= parent[at]) {
+            for (Integer at = target; at != -1; at = parent[at]) {
                 path.add(at);
             }
             Collections.reverse(path);
@@ -766,7 +759,7 @@ public class Test {
     /**
      * 合并区间
      */
-    public ArrayList<Interval> merge (ArrayList<Interval> intervals) {
+    public ArrayList<Interval> merge(ArrayList<Interval> intervals) {
         // 先做排序 之后在做别的 排序过程中进行合并
         if (intervals == null || intervals.size() <= 1) {
             return intervals;
@@ -785,7 +778,7 @@ public class Test {
             Interval next = intervals.get(i);
 
             // 如果当前区间与下一个区间有重叠
-            if(current.end >= next.start) {
+            if (current.end >= next.start) {
                 current.end = Math.max(next.end, current.end);
             } else {
                 // 没有重叠，开始处理下一个区间
@@ -800,8 +793,8 @@ public class Test {
     /**
      * 删除链表的倒数第N个节点
      */
-    public ListNode removeNthFromEnd (ListNode head, int n) {
-        if(head == null || n<=0) {
+    public ListNode removeNthFromEnd(ListNode head, int n) {
+        if (head == null || n <= 0) {
             return null;
         }
 
@@ -811,22 +804,22 @@ public class Test {
         ListNode pre = dummy;
         ListNode cur = dummy.next;
         // 先看看有多少个节点
-        while(cur!=null) {
+        while (cur != null) {
             cur = cur.next;
             k++;
         }
-        if(k < n) {
+        if (k < n) {
             return dummy.next;
         }
-        if(k == n) {
+        if (k == n) {
             dummy.next = head.next;
             return dummy.next;
         }
 
         // 存在n比链表长度长 等于链表长度 小于链表长度 记录前一个链表节点
-        int temp = k-n; // 此处注意，下边是大于1还是大于0 k-n+1 是第几个节点，从1开始 注意下标从0开始
+        int temp = k - n; // 此处注意，下边是大于1还是大于0 k-n+1 是第几个节点，从1开始 注意下标从0开始
         cur = dummy.next;
-        while(temp>0 && cur!=null) {
+        while (temp > 0 && cur != null) {
             pre = cur;
             cur = cur.next;
             temp--;
@@ -841,12 +834,12 @@ public class Test {
     /**
      * 比较版本号
      */
-    public int compare (String version1, String version2) {
-        if(version1==null && version2==null) {
+    public int compare(String version1, String version2) {
+        if (version1 == null && version2 == null) {
             return 0;
         }
-        if(version1==null || version2==null) {
-            return version1==null ? 1 : 1;
+        if (version1 == null || version2 == null) {
+            return version1 == null ? 1 : 1;
         }
 
         // 将两个版本号分割成两个列表或者数组，之后做比对
@@ -856,28 +849,28 @@ public class Test {
         int v2Len = v2Arr.length;
 
         // 长度相同 和 长度不同
-        for(int i=0; i<Math.min(v1Len, v2Len); i++) {
+        for (int i = 0; i < Math.min(v1Len, v2Len); i++) {
             int num1 = Integer.parseInt(v1Arr[i]);
             int num2 = Integer.parseInt(v2Arr[i]);
-            if(num1 > num2) {
+            if (num1 > num2) {
                 return 1;
-            } else if(num1 < num2) {
+            } else if (num1 < num2) {
                 return -1;
             }
         }
 
         // 需要判断后续剩余的是不是都为0
-        if(v1Len < v2Len) {
-            for(int i=v1Len; i<v2Len; i++) {
+        if (v1Len < v2Len) {
+            for (int i = v1Len; i < v2Len; i++) {
                 int num = Integer.parseInt(v2Arr[i]);
-                if(num!=0) {
+                if (num != 0) {
                     return -1;
                 }
             }
         } else {
-            for(int i=v2Len; i<v1Len; i++) {
+            for (int i = v2Len; i < v1Len; i++) {
                 int num = Integer.parseInt(v1Arr[i]);
-                if(num!=0) {
+                if (num != 0) {
                     return 1;
                 }
             }
@@ -889,22 +882,22 @@ public class Test {
     /**
      * 合并二叉树
      */
-    public TreeNode mergeTrees (TreeNode t1, TreeNode t2) {
-        if(t1==null && t2==null) {
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+        if (t1 == null && t2 == null) {
             return null;
         }
-        if(t1==null || t2==null) {
-            return t1==null ? t2 : t1;
+        if (t1 == null || t2 == null) {
+            return t1 == null ? t2 : t1;
         }
         return buildTreeNode(t1, t2);
     }
 
     private TreeNode buildTreeNode(TreeNode t1, TreeNode t2) {
         // 终止条件
-        if(t1==null) {
+        if (t1 == null) {
             return t2;
         }
-        if(t2==null) {
+        if (t2 == null) {
             return t1;
         }
 
@@ -914,7 +907,7 @@ public class Test {
         return root;
     }
 
-    public TreeNode mergeTrees1 (TreeNode t1, TreeNode t2) {
+    public TreeNode mergeTrees1(TreeNode t1, TreeNode t2) {
         // 终止条件
         if (t1 == null) {
             return t2;
@@ -997,14 +990,14 @@ public class Test {
     /**
      * 两数之和
      */
-    public int[] twoSum (int[] numbers, int target) {
-        Map<Integer,Integer> map = new HashMap<>();
+    public int[] twoSum(int[] numbers, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
 
-        for(int i=0; i<numbers.length; i++) {
-            if(map.containsKey(numbers[i])) {
-                return new int[]{map.get(numbers[i])+1, i+1};
+        for (int i = 0; i < numbers.length; i++) {
+            if (map.containsKey(numbers[i])) {
+                return new int[]{map.get(numbers[i]) + 1, i + 1};
             }
-            map.put(target-numbers[i], i);
+            map.put(target - numbers[i], i);
         }
 
         return new int[]{};
@@ -1013,8 +1006,8 @@ public class Test {
     /**
      * 三数之和
      */
-    public ArrayList<ArrayList<Integer>> threeSum (int[] num) {
-        if(num==null || num.length<=2) {
+    public ArrayList<ArrayList<Integer>> threeSum(int[] num) {
+        if (num == null || num.length <= 2) {
             return new ArrayList<>();
         }
 
@@ -1022,7 +1015,7 @@ public class Test {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
 
         // 怎么转换为两束之和 同时怎么去重
-        for(int i=0; i<num.length; i++) {
+        for (int i = 0; i < num.length; i++) {
             if (i > 0 && num[i] == num[i - 1]) {
                 continue;
             }
@@ -1031,11 +1024,11 @@ public class Test {
             ArrayList<Integer> list = twoSum(num, -num[i], i);
 
             // 没有匹配的结果
-            if(list.size()==0) {
+            if (list.size() == 0) {
                 continue;
             }
             // 存在匹配的结果，但是这两个值已经引用过了
-            if(list.size()==2 && map.containsKey(i) && list.contains(map.get(i)[0]) && list.contains(map.get(i)[1])) {
+            if (list.size() == 2 && map.containsKey(i) && list.contains(map.get(i)[0]) && list.contains(map.get(i)[1])) {
                 continue;
             }
 
@@ -1054,20 +1047,20 @@ public class Test {
         return result;
     }
 
-    public ArrayList<Integer> twoSum (int[] numbers, int target, int except) {
+    public ArrayList<Integer> twoSum(int[] numbers, int target, int except) {
         ArrayList<Integer> result = new ArrayList<>();
-        Map<Integer,Integer> map = new HashMap<>();
+        Map<Integer, Integer> map = new HashMap<>();
 
-        for(int i=0; i<numbers.length; i++) {
-            if(i==except) {
-               continue;
+        for (int i = 0; i < numbers.length; i++) {
+            if (i == except) {
+                continue;
             }
-            if(map.containsKey(numbers[i])) {
+            if (map.containsKey(numbers[i])) {
                 result.add(map.get(numbers[i]));
                 result.add(i);
                 break;
             }
-            map.put(target-numbers[i], i);
+            map.put(target - numbers[i], i);
         }
 
         return result;
@@ -1301,6 +1294,7 @@ public class Test {
 
     /**
      * 序列化与反序列化
+     *
      * @param root
      * @return
      */
@@ -1313,6 +1307,7 @@ public class Test {
 
         return null;
     }
+
     TreeNode Deserialize(String str) {
         return null;
     }
@@ -1326,7 +1321,7 @@ public class Test {
      * 课程表
      * 单词搜索
      * 跳跃游戏III
-     * 打开转盘锁 无
+     * 打开转盘锁
      *
      * 单词转换
      * 婴儿名字
@@ -1342,13 +1337,13 @@ public class Test {
     public boolean course(int cources, int[][] depends) {
         // 首先先列出该课程被哪些课程依赖
         ArrayList<Integer>[] courseDependList = new ArrayList[cources];
-        for(int i=0; i<cources; i++) {
+        for (int i = 0; i < cources; i++) {
             courseDependList[i] = new ArrayList<Integer>();
         }
 
         // 其次列出修当前课程需要依赖的课程数
         int[] dependArr = new int[cources];
-        for(int i=0; i<cources; i++) {
+        for (int i = 0; i < cources; i++) {
             int course = depends[i][0];
             int dependCourse = depends[i][1];
             courseDependList[dependCourse].add(course);
@@ -1357,9 +1352,9 @@ public class Test {
 
         // 更具依赖关系，找出不需要依赖别的课程可修的课程，一次推理执行
         LinkedList<Integer> queue = new LinkedList<>();
-        for(int i=0; i<dependArr.length; i++) {
+        for (int i = 0; i < dependArr.length; i++) {
             int dependCourses = dependArr[i];
-            if(dependCourses==0) {
+            if (dependCourses == 0) {
                 // 注意放入的顺序
                 queue.offer(i);
             }
@@ -1367,22 +1362,22 @@ public class Test {
 
         // 统计可以完成的课程数
         int finishCourses = 0;
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             int dependCourse = queue.remove();
             // 总共修的课程数又增了一门
             finishCourses++;
             // 看看哪些课程依赖了本课程
             ArrayList<Integer> dependList = courseDependList[dependCourse];
-            for(Integer course : dependList) {
+            for (Integer course : dependList) {
                 // 依赖的课程少了一门
                 dependArr[course]--;
-                if(dependArr[course]==0) {
+                if (dependArr[course] == 0) {
                     queue.add(course);
                 }
             }
         }
 
-        return finishCourses==cources;
+        return finishCourses == cources;
     }
 
     /**
@@ -1390,7 +1385,7 @@ public class Test {
      * https://leetcode.cn/problems/unique-paths-iii/?envType=problem-list-v2&envId=backtracking
      */
     public int uniquePathsIII1(int[][] grid) {
-        if(grid==null || grid.length==0 || grid[0].length==0) {
+        if (grid == null || grid.length == 0 || grid[0].length == 0) {
             return 0;
         }
 
@@ -1404,13 +1399,13 @@ public class Test {
         List<List<MyPosi>> result = new ArrayList<>();
         List<MyPosi> path = new ArrayList<>();
         // 首先找到开始的坐标
-        for(int i=0; i<h; i++) {
-            for(int j=0; j<w; j++) {
-                if(grid[i][j]==1) {
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                if (grid[i][j] == 1) {
                     emptyCount++;
                     startX = i;
                     startY = j;
-                } else if(grid[i][j]==0 ||grid[i][j]==2) {
+                } else if (grid[i][j] == 0 || grid[i][j] == 2) {
                     emptyCount++;
                 }
             }
@@ -1423,34 +1418,34 @@ public class Test {
 
     private void uniquePathsIIIDfs(int[][] grid, boolean[][] visited, int i, int j, int emptyCount, int h, int w, List<MyPosi> path, List<List<MyPosi>> result) {
         path.add(new MyPosi(i, j));
-        if(path.size() == emptyCount-1) {
+        if (path.size() == emptyCount - 1) {
             return;
         }
-        if(grid[i][j]==2) {
+        if (grid[i][j] == 2) {
             result.add(new ArrayList<>(path));
-            path.remove(path.size()-1);
+            path.remove(path.size() - 1);
             return;
         }
-        if(grid[i][j]==-1) {
+        if (grid[i][j] == -1) {
             return;
         }
         visited[i][j] = true;
 
         int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-        for(int[] di : dirs) {
+        for (int[] di : dirs) {
             int newi = i + di[0];
             int newj = j + di[1];
-            if(newi>=0 && newi<h && newj>=0 && newj<w && !visited[newi][newj] && grid[newi][newj]==0) {
+            if (newi >= 0 && newi < h && newj >= 0 && newj < w && !visited[newi][newj] && grid[newi][newj] == 0) {
                 uniquePathsIIIDfs(grid, visited, newi, newj, emptyCount, h, w, path, result);
             }
         }
 
-        path.remove(path.size()-1);
+        path.remove(path.size() - 1);
         visited[i][j] = false;
     }
 
     public static void main3(String[] args) {
-        int[][] grid = {{1,0,0,0}, {0,0,0,0}, {0,0,2,-1}};
+        int[][] grid = {{1, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 2, -1}};
         int result = new Test().uniquePathsIII(grid);
         System.out.println(result);
     }
@@ -1519,16 +1514,16 @@ public class Test {
     /**
      * 三数之和
      */
-    public ArrayList<ArrayList<Integer>> threeSum5 (int[] nums) {
+    public ArrayList<ArrayList<Integer>> threeSum5(int[] nums) {
         ArrayList<ArrayList<Integer>> result = new ArrayList<>();
-        if(nums==null || nums.length<3) {
+        if (nums == null || nums.length < 3) {
             return result;
         }
 
         Arrays.sort(nums);
-        for(int i=0; i<nums.length-2; i++) {
+        for (int i = 0; i < nums.length - 2; i++) {
             // 当第一个指针指向的数字大于0时候，后边的数字肯定都大于0
-            if(nums[i] > 0) {
+            if (nums[i] > 0) {
                 break;
             }
             // 跳过所有的重复值
@@ -1536,29 +1531,29 @@ public class Test {
                 continue;
             }
 
-            int left = i+1;
-            int right = nums.length-1;
-            while(left < right) {
+            int left = i + 1;
+            int right = nums.length - 1;
+            while (left < right) {
                 int sum = nums[i] + nums[left] + nums[right];
-                if(sum==0) {
+                if (sum == 0) {
                     ArrayList<Integer> list = new ArrayList<>();
                     list.add(nums[i]);
                     list.add(nums[left]);
                     list.add(nums[right]);
                     result.add(list);
 
-                    while(left<right && nums[left]==nums[left+1]) {
+                    while (left < right && nums[left] == nums[left + 1]) {
                         left++;
                     }
-                    while(left<right && nums[right]==nums[right-1]) {
+                    while (left < right && nums[right] == nums[right - 1]) {
                         right--;
                     }
 
                     left++;
                     right--;
-                }else if(sum < 0) {
+                } else if (sum < 0) {
                     left++;
-                }else {
+                } else {
                     right--;
                 }
             }
@@ -1567,21 +1562,21 @@ public class Test {
         return result;
     }
 
-    public static void main(String[] args) {
-        int[] nums = new int[]{-2,0,0,2,2};
+    /*public static void main(String[] args) {
+        int[] nums = new int[]{-2, 0, 0, 2, 2};
         ArrayList<ArrayList<Integer>> result = new Test().threeSum5(nums);
         System.out.println(result.size());
-    }
+    }*/
 
     /**
      * 字符串的全排列
      */
-    public ArrayList<String> Permutation (String str) {
+    public ArrayList<String> Permutation(String str) {
         ArrayList<String> result = new ArrayList<>();
-        if(str==null || str.length()==0) {
+        if (str == null || str.length() == 0) {
             return result;
         }
-        if(str.length()<2) {
+        if (str.length() < 2) {
             result.add(str);
             return result;
         }
@@ -1596,22 +1591,22 @@ public class Test {
     }
 
     private void PermutationBackTrace(char[] cs, boolean[] used, int step, StringBuilder path, ArrayList<String> result) {
-        if(step == cs.length) {
+        if (step == cs.length) {
             result.add(new String(path));
             return;
         }
 
-        for(int i=0; i<cs.length; i++) {
-            if(used[i]) {
+        for (int i = 0; i < cs.length; i++) {
+            if (used[i]) {
                 continue;
             }
-            if(i>0 && cs[i-1]==cs[i] && !used[i-1]) {
+            if (i > 0 && cs[i - 1] == cs[i] && !used[i - 1]) {
                 continue;
             }
             path.append(cs[i]);
             used[i] = true;
-            PermutationBackTrace(cs, used, step+1, path, result);
-            path.deleteCharAt(path.length()-1);
+            PermutationBackTrace(cs, used, step + 1, path, result);
+            path.deleteCharAt(path.length() - 1);
             used[i] = false;
         }
     }
@@ -1619,9 +1614,119 @@ public class Test {
     /**
      * 滑动窗口的最大值
      */
-    public ArrayList<Integer> maxInWindows (int[] num, int size) {
+    public ArrayList<Integer> maxInWindows(int[] num, int size) {
         // 单调栈
         return null;
+    }
+
+    /*public static void main(String[] args) {
+        int[] nums = new int[]{3,2,4};
+        int target = 6;
+        int[] sum = new Test().twoSum1(nums, target);
+        System.out.println();
+        for(Integer n : sum) {
+            System.out.println(n);
+        }
+
+        nums = new int[]{5,75,25};
+        target = 100;
+        sum = new Test().twoSum1(nums, target);
+        System.out.println();
+        for(Integer n : sum) {
+            System.out.println(n);
+        }
+    }*/
+
+    /**
+     * 开锁
+     * deadends 代表死亡组合 永久锁死 不能转到这些数字
+     * target 代表解锁码
+     * 从 0000开始怎么尽快解锁
+     * 找最短路径 BFS
+     */
+    public int openLock(String[] deadends, String target) {
+        String begin = "0000";
+        HashSet<String> deadSet = new HashSet<>();
+        for(String d : deadends) {
+            deadSet.add(d);
+        }
+        if(deadSet.contains(begin)) {
+            return -1;
+        }
+
+        Queue<String> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        queue.offer(begin);
+        visited.add(begin);
+
+        int depth = 0;
+        while(!queue.isEmpty()) {
+            int size = queue.size();
+            int k = 0;
+            while(k < size) {
+                String node = queue.poll();
+                k++;
+                // 找到了
+                if(node.equals(target)) {
+                    return depth;
+                }
+                List<String> newNodes = getNewNode(node);
+                for(String newNode : newNodes) {
+                    if(visited.contains(newNode) || deadSet.contains(newNode)) {
+                        continue;
+                    }
+                    queue.add(newNode);
+                    visited.add(newNode);
+                }
+            }
+            depth++;
+        }
+
+        return -1;
+    }
+
+    private List<String> getNewNode(String node) {
+        List<String> newNodes = new ArrayList<>();
+        int[] change = {-1, 1};
+        for(int i=0; i<4; i++) {
+            for(int k=0; k<2; k++) {
+                char[] newNode = new char[4];
+                for(int j=0; j<i; j++) {
+                    newNode[j] = node.charAt(j);
+                }
+                for(int j=i+1; j<4; j++) {
+                    newNode[j] = node.charAt(j);
+                }
+                String newC = String.valueOf(((node.charAt(i)-'0') + change[k] + 10) % 10);
+                newNode[i] = newC.charAt(0);
+                newNodes.add(new String(newNode));
+            }
+        }
+        return newNodes;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = new int[]{1,2,3,3,2,9};
+        int xor = nums[0];
+        for(int i=1; i<nums.length; i++) {
+            xor ^= nums[i];
+        }
+
+        // 找到异或和中间为1的位
+        int mask = 1;
+        while((xor & mask) == 0) {
+            mask <<= 1;
+        }
+
+        int num1 = 0;
+        int num2 = 0;
+        for(int i=0; i<nums.length; i++) {
+            if((nums[i] & mask) == 0) {
+                num1 ^= nums[i];
+            }else {
+                num2 ^= nums[i];
+            }
+        }
     }
 
 }
