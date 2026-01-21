@@ -215,4 +215,92 @@ public class MyTwoPointer {
         return (int) minRet;
     }
 
+    /**
+     * 调整数组顺序使奇数位于偶数前边
+     */
+    public int[] exchange(int[] nums) {
+        int i=0;
+        int j=nums.length-1;
+        while(i<j) {
+            if(nums[i] % 2 == 1) {
+                i++;
+                continue;
+            }
+            if(nums[j] % 2 == 0) {
+                j--;
+                continue;
+            }
+            swap(nums, i, j);
+            i++;
+            j--;
+        }
+        return nums;
+    }
+
+    /**
+     * 颜色分类
+     */
+    public void sortColors(int[] nums) {
+        int i=0;
+        int j=nums.length-1;
+        while(i<j) {
+            while(nums[i]!=2) {
+                i++;
+            }
+            while(nums[j]==2) {
+                j--;
+            }
+            swap(nums, i, j);
+        }
+
+        int ii=0;
+        int jj=j; // 确定此处是不是为2
+        while(ii<jj) {
+            while(nums[ii]==0) {
+                ii++;
+            }
+            while(nums[jj]==1) {
+                jj--;
+            }
+            swap(nums, ii, jj);
+        }
+    }
+
+    /**
+     * 单词距离
+     */
+    public int findClosest(String[] words, String word1, String word2) {
+        List<Integer> w1ps = new ArrayList<>();
+        List<Integer> w2ps = new ArrayList<>();
+        for(int i=0; i<words.length; i++) {
+            String word = words[i];
+            if(word.equals(word1)) {
+                w1ps.add(i);
+            }else if(word.equals(word2)) {
+                w2ps.add(i);
+            }
+        }
+
+        int p1=0;
+        int p2=0;
+        int minRet = Integer.MAX_VALUE;
+        while(p1<word1.length() && p2<word2.length()) {
+            int pos1 = w1ps.get(p1);
+            int pos2 = w2ps.get(p2);
+            if(pos1>pos2) {
+                if(minRet>pos1-pos2) {
+                    minRet=pos1-pos2;
+                }
+                p2++;
+            }else {
+                if(minRet>pos2-pos1) {
+                    minRet=pos2-pos1;
+                }
+                p1++;
+            }
+        }
+
+        return minRet;
+    }
+
 }
