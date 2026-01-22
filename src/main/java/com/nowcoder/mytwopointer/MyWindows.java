@@ -83,14 +83,17 @@ public class MyWindows {
         if(m>n) {
             return result;
         }
+        // 初始化频率数组
         int[] needs = new int[26];
         for(int i=0; i<m; i++) {
             needs[p.charAt(i)-'a']++;
         }
+        // 记录当前窗口中每个字母的出现次数
         int[] matched = new int[26];
 
         int start=0;
         int end=0;
+        // 构建第一个长度为m的窗口
         while(end<m) {
             matched[s.charAt(end)-'a']++;
             end++;
@@ -192,6 +195,8 @@ public class MyWindows {
         }
         return true;
     }
+
+
 
 
 }
