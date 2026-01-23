@@ -279,7 +279,9 @@ public class Demo {
     }
 
     public String minWindow2(String s, String t) {
-        if (s == null || t == null || s.length() < t.length()) return "";
+        if(s == null || s.length()==0 || t == null || t.length()==0 || s.length() < t.length()) {
+            return "";
+        }
 
         int minSize = Integer.MAX_VALUE;
         int minStart = -1;
