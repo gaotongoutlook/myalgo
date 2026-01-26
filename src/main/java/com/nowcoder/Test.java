@@ -64,4 +64,57 @@ public class Test {
         return true;
     }
 
+    /**
+     * 除自身以外的数组乘积
+     */
+    public int[] productExceptSelf(int[] nums) {
+        int n = nums.length;
+        int[] result = new int[n];
+
+        int leftProduct = 1;
+        for(int i=0; i<n; i++) {
+            result[i] *= leftProduct;
+            leftProduct *= nums[i];
+        }
+
+        int rightProduct = 1;
+        for(int i=n-1; i>=0; i--) {
+            result[i] *= rightProduct;
+            rightProduct *= nums[i];
+        }
+
+        return result;
+    }
+
+    public int[] productExceptSelf1(int[] nums) {
+        int n = nums.length;
+        int[] leftProducts = new int[n];
+        int[] rightProducts = new int[n];
+
+        int product = 1;
+        for(int i=0; i<n; i++) {
+            product *= nums[i];
+            leftProducts[i] = product;
+        }
+
+        product = 1;
+        for(int i=n-1; i>=0; i--) {
+            product *= nums[i];
+            rightProducts[i] = product;
+        }
+
+        int[] result = new int[n];
+        for(int i=0; i<n; i++) {
+            result[i] = 1;
+            if(i>0) {
+                result[i] *= leftProducts[i];
+            }
+            if(i<n-1) {
+                result[i] *= rightProducts[i];
+            }
+        }
+
+        return result;
+    }
+
 }

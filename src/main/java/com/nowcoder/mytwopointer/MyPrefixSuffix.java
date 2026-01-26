@@ -7,6 +7,7 @@ public class MyPrefixSuffix {
 
     /**
      * 买卖股票的最佳时机
+     * 只能买卖一次，求最大利润
      */
     public int maxProfit(int[] prices) {
         int n = prices.length;
@@ -25,6 +26,33 @@ public class MyPrefixSuffix {
             }
         }
         return result;
+    }
+
+    public int maxProfit1(int[] prices) {
+        int n = prices.length;
+        if (n == 0) return 0;
+
+        // 前缀最小值：到当前位置为止的最低价格
+        int[] minPrice = new int[n];
+        minPrice[0] = prices[0];
+        for (int i = 1; i < n; i++) {
+            minPrice[i] = Math.min(minPrice[i-1], prices[i]);
+        }
+
+        // 后缀最大值：从当前位置往后的最高价格
+        int[] maxPrice = new int[n];
+        maxPrice[n-1] = prices[n-1];
+        for (int i = n-2; i >= 0; i--) {
+            maxPrice[i] = Math.max(maxPrice[i+1], prices[i]);
+        }
+
+        // 计算最大利润
+        int maxProfit = 0;
+        for (int i = 0; i < n; i++) {
+            maxProfit = Math.max(maxProfit, maxPrice[i] - minPrice[i]);
+        }
+
+        return maxProfit;
     }
 
     /**
@@ -148,7 +176,7 @@ public class MyPrefixSuffix {
 
         int result = 0;
         for(int i=1; i<n-1; i++) {
-            result += Math.min(leftMax[i], rightMax[i]-height[i]);
+            result += Math.min(leftMax[i], rightMax[i])-height[i];
         }
 
         return result;
@@ -163,6 +191,7 @@ public class MyPrefixSuffix {
         int sum = nums[0];
 
         for(int i=1; i<n; i++) {
+            // 如果不小于0这个子序就可以包含
             if(sum < 0) {
                 sum = 0;
             }
@@ -195,16 +224,13 @@ public class MyPrefixSuffix {
         for(int i=sum.length-1; i>=0; i--) {
             if(curMax < sum[i]) {
                 curMax = sum[i];
-                max[i] = curMax;
             }
+            max[i] = curMax;
         }
 
-        int result = Integer.MIN_VALUE;
-        for(int i=0; i<nums.length; i++) {
-            if(i==0 && result<max[0]) {
-                result = max[0];
-            }
-            if(i!=0 && result<max[i]-sum[i-1]) {
+        int result = max[0];
+        for(int i=1; i<nums.length; i++) {
+            if(result<max[i]-sum[i-1]) {
                 result = max[i] - sum[i-1];
             }
         }
