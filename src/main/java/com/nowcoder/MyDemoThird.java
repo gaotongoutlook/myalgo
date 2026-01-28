@@ -261,6 +261,43 @@ public class MyDemoThird {
         return sb.toString();
     }
 
+    /**
+     * 分糖果
+     */
+    public int candy (int[] arr) {
+        if(arr==null || arr.length==0) {
+            return 0;
+        }
+
+        int n = arr.length;
+        int[] candies = new int[n];
+
+        // 初始化每个孩子分配一个糖果
+        for(int i=0; i<n; i++) {
+            candies[i] = 1;
+        }
+
+        // 从左往右确定评分高的孩子分的糖果多
+        for(int i=1; i<n; i++) {
+            if(candies[i] > candies[i-1]) {
+                candies[i] = candies[i-1] + 1;
+            }
+        }
+
+        // 从右往左确定评分高的孩子分的糖果多
+        for(int i=n-2; i>=0; i--) {
+            if(candies[i] > candies[i+1]) {
+                candies[i] = Math.max(candies[i], candies[i+1]+1);
+            }
+        }
+
+        int total = 0;
+        for(int candy : candies) {
+            total += candy;
+        }
+
+        return total;
+    }
 
 
 }
