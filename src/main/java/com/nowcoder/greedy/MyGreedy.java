@@ -173,4 +173,69 @@ public class MyGreedy {
         return hosts;
     }
 
+    /**
+     * 会议室宣讲 最多安排多少个会议室
+     */
+    public static int maxActivities(int[][] activities) {
+        if(activities==null || activities.length==0) {
+            return 0;
+        }
+
+        int n = activities.length;
+        int[] startTime = new int[n];
+        int[] endTime = new int[n];
+
+        for(int i=0; i<n; i++) {
+            startTime[i] = activities[i][0];
+            endTime[i] = activities[i][1];
+        }
+
+        Arrays.sort(startTime);
+        Arrays.sort(endTime);
+
+        int total = 0;
+        int endIndex = 0;
+        for(int i=0; i<n; i++) {
+            if(startTime[i] >= endTime[endIndex]) {
+                endIndex++;
+            }else {
+                total++;
+            }
+        }
+
+        return total;
+    }
+
+
+    /**
+     * 会议室宣讲 一个会议室能安排多少次宣讲
+     */
+    public static int maxActivities1(int[][] activities) {
+        if(activities==null || activities.length==0) {
+            return 0;
+        }
+
+        int n = activities.length;
+        Arrays.sort(activities, (a, b) -> {
+            if(a[0] == b[0]) {
+                return a[1] - b[1];
+            }else {
+                return a[0] - b[0];
+            }
+        });
+
+        int count = 1;
+        int lastEnd = activities[0][1];
+        for(int i=1; i<n; i++) {
+            int start = activities[i][0];
+            int end = activities[i][1];
+            if(start >= lastEnd) {
+                count++;
+                lastEnd = end;
+            }
+        }
+
+        return count;
+    }
+
 }

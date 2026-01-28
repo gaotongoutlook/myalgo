@@ -299,5 +299,190 @@ public class MyDemoThird {
         return total;
     }
 
+    /**
+     * 大数加法
+     */
+    public String solve (String s, String t) {
+        if (s == null || s.isEmpty() || "0".equals(s)){
+            return t;
+        }
+        if (t == null || t.isEmpty() || "0".equals(t)){
+            return s;
+        }
+
+        String result = "";
+
+        boolean sBigZero = s.charAt(0)!='-';
+        if(!sBigZero || s.charAt(0)=='+') {
+            s = s.substring(1, s.length()-1);
+        }
+
+        boolean tBigZero = t.charAt(0)!='-';
+        if(!tBigZero || t.charAt(0)=='+') {
+            t = t.substring(1, t.length()-1);
+        }
+        while(t.charAt(0)=='0') {
+            t = t.substring(1, t.length()-1);
+        }
+
+        // 首先判断，是否包含正好和负号
+        if(sBigZero == tBigZero) {
+            // 相加操作 然后最后添加符号
+            result = addSolve(sBigZero, s, t);
+        }else if(s.length() > t.length()) {
+            // 都是长的减去短的，之后保留长的符号
+            result = addSolve(sBigZero, s, t);
+        }else if(s.length() < t.length()) {
+            // 都是长的减去短的，之后保留长的符号
+            result = addSolve(tBigZero, t, s);
+        }else {
+            result = compareAndCal(sBigZero, s, t);
+        }
+
+        return result;
+    }
+
+    private String addSolve(boolean flag, String a, String b) {
+        StringBuilder result = new StringBuilder();
+
+        int i = a.length()-1;
+        int j = b.length()-1;
+        int carry = 0;
+
+        while(i>=0 && j>=0) {
+            int numa = a.charAt(i)-'0';
+            int numb = b.charAt(j)-'0';
+            int sum = numa + numb + carry;
+            if(sum > 9) {
+                sum = sum - 10;
+                carry = 1;
+            }else {
+                carry = 0;
+            }
+            result.append(sum);
+            i--;
+            j--;
+        }
+
+        while(i >= 0) {
+            int numa = a.charAt(i)-'0';
+            int sum = numa + carry;
+            if(sum > 9) {
+                sum = sum - 10;
+                carry = 1;
+            }else {
+                carry = 0;
+            }
+            result.append(sum);
+            i--;
+        }
+
+        while(j >= 0) {
+            int numb = b.charAt(j)-'0';
+            int sum = numb + carry;
+            if(sum > 9) {
+                sum = sum - 10;
+                carry = 1;
+            }else {
+                carry = 0;
+            }
+            result.append(sum);
+            j--;
+        }
+
+        if(carry>0) {
+            result.append(carry);
+            carry = 0;
+        }
+
+        if(!flag) {
+            result.append("-");
+        }
+
+        return result.reverse().toString();
+    }
+
+    private String subSolve(boolean flag, String a, String b) {
+        StringBuilder result = new StringBuilder();
+
+        int i = a.length()-1;
+        int j = b.length()-1;
+        int carry = 0;
+
+        while(i>=0 && j>=0) {
+            int numa = a.charAt(i)-'0';
+            int numb = b.charAt(j)-'0';
+            int sum = numa - carry - numb;
+
+            if(sum >= 0) {
+                carry = 0;
+            }else {
+                sum = sum + 10;
+                carry = 1;
+            }
+            result.append(sum);
+            i--;
+            j--;
+        }
+
+        int last = 0;
+        while(i>=0) {
+            int numa = a.charAt(i)-'0';
+            int sum = numa - carry;
+            if(sum >= 0) {
+                carry = 0;
+            }else {
+                sum = sum + 10;
+                carry = 1;
+            }
+            last = sum;
+            result.append(sum);
+            i--;
+        }
+
+        if(last==0) {
+            result.deleteCharAt(result.length()-1);
+        }
+
+        if(!flag) {
+            result.append("-");
+        }
+
+        return result.reverse().toString();
+    }
+
+    private String compareAndCal(boolean flag, String a, String b) {
+        if(a.equals(b)) {
+            return "0";
+        }
+
+        StringBuilder result = new StringBuilder();
+
+        int i = a.length()-1;
+        int j = b.length()-1;
+        int carry = 0;
+        while(i>=0 && j>=0) {
+            int numa = a.charAt(i)-'0';
+            int numb = b.charAt(j)-'0';
+            int sum = numa - carry - numb;
+
+            if(sum >= 0) {
+                carry = 0;
+            }else {
+                sum = sum + 10;
+                carry = 1;
+            }
+            result.append(sum);
+            i--;
+            j--;
+        }
+
+        // 前边的小 前边的是正数 则返回负数 或者前边的大 前边是负数 则返回负数
+        if((carry>0 && flag) || (carry==0 && !flag)) {
+            result.append("-");
+        }
+
+        return result.reverse().toString();
+    }
 
 }
