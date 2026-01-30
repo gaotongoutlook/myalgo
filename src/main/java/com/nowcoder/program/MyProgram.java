@@ -1,5 +1,8 @@
 package com.nowcoder.program;
 
+import java.math.BigInteger;
+import java.util.Arrays;
+
 /**
  * 编程题
  */
@@ -10,7 +13,33 @@ public class MyProgram {
      * https://leetcode.cn/problems/two-sum/
      */
     public int[] twoSum(int[] nums, int target) {
-        return null;
+        if(nums==null || nums.length==0) {
+            return new int[]{};
+        }
+
+        int n = nums.length;
+        int[][] numbers = new int[n][2];
+        for(int i=0; i<n; i++) {
+            numbers[i][0] = nums[i];
+            numbers[i][1] = i;
+        }
+
+        Arrays.sort(numbers);
+
+        int i = 0;
+        int j = n-1;
+        while(i<j) {
+            int sum = numbers[i][0]+numbers[j][0];
+            if(target == sum) {
+                return new int[]{numbers[i][1], numbers[j][1]};
+            }else if(sum < target) {
+                i++;
+            }else {
+                j--;
+            }
+        }
+
+        return new int[]{-1, -1};
     }
 
     /**
@@ -18,7 +47,10 @@ public class MyProgram {
      * https://leetcode.cn/problems/defanging-an-ip-address/description/
      */
     public String defangIPaddr(String address) {
-        return "";
+        if(address==null || address.length()==0) {
+            return address;
+        }
+        return address.replaceAll("\\.", "[.]");
     }
 
     /**
@@ -26,7 +58,19 @@ public class MyProgram {
      * https://leetcode.cn/problems/reverse-string/description/
      */
     public void reverseString(char[] s) {
+        if(s==null || s.length==0) {
+            return;
+        }
 
+        int i=0;
+        int j=s.length-1;
+        while(i<j) {
+            char temp = s[i];
+            s[i] = s[j];
+            s[j] = temp;
+            i++;
+            j--;
+        }
     }
 
     /**
@@ -34,7 +78,19 @@ public class MyProgram {
      * https://leetcode.cn/problems/fan-zhuan-dan-ci-shun-xu-lcof/description/
      */
     public String reverseMessage(String message) {
-        return "";
+        if(message==null || message.length()==0) {
+            return message;
+        }
+
+        StringBuilder result = new StringBuilder();
+        String[] msgArr = message.trim().split(" ");
+        for(String msg : msgArr) {
+            if(!msg.isEmpty()) {
+                result.append(msg);
+            }
+        }
+
+        return result.reverse().toString();
     }
 
     /**
@@ -42,7 +98,21 @@ public class MyProgram {
      * https://leetcode.cn/problems/valid-palindrome/description/
      */
     public boolean isPalindrome(String s) {
-        return false;
+        if(s==null || s.length()==0) {
+            return false;
+        }
+
+        int i=0;
+        int j=s.length()-1;
+        while(i<j) {
+            if(s.charAt(i)!=s.charAt(j)) {
+                return false;
+            }
+            i++;
+            j--;
+        }
+
+        return true;
     }
 
     /**
@@ -50,7 +120,71 @@ public class MyProgram {
      * https://leetcode.cn/problems/palindrome-number/description/
      */
     public boolean isPalindrome(int x) {
-        return false;
+        if(x < 0) {
+            return false;
+        }
+        String number = Integer.toString(x);
+        String reversed = new StringBuffer(number).reverse().toString();
+        return number.equals(reversed);
+    }
+
+    /**
+     * 回文数
+     */
+    public boolean isPalindrome1(int x) {
+        if(x<0 || (x%10==0 && x!=0)) {
+            return false;
+        }
+
+        int reversed = 0;
+        int original = x;
+        while(x>0) {
+            int digit = x % 10;
+            reversed = reversed * 10 + digit;
+            x /= 10;
+        }
+
+        return reversed==original;
+    }
+
+    /**
+     * 回文数
+     */
+    public boolean isPalindrome2(int x) {
+        if(x < 0) {
+            return false;
+        }
+
+        char[] cs = Integer.toString(x).toCharArray();
+        int left = 0;
+        int right = cs.length - 1;
+
+        while(left < right) {
+            if(cs[left] != cs[right]) {
+                return false;
+            }
+            left++;
+            right--;
+        }
+
+        return true;
+    }
+
+    /**
+     * 回文数
+     */
+    public boolean isPalindrome3(int x) {
+        if (x < 0 || (x % 10 == 0 && x != 0)) {
+            return false;
+        }
+
+        int reversed = 0;
+        while(x > reversed) {
+            reversed = reversed * 10 + x % 10;
+            x /= 10;
+        }
+
+        return x==reversed || x==reversed/10;
     }
 
     /**
@@ -58,7 +192,26 @@ public class MyProgram {
      * https://leetcode.cn/problems/length-of-last-word/description/
      */
     public int lengthOfLastWord(String s) {
-        return 0;
+        if(s==null || s.length()==0) {
+            return 0;
+        }
+
+        int len = 0;
+        s = s.trim();
+        for(int i=s.length()-1; i>=0; i--) {
+            char ch = s.charAt(i);
+            if(ch == ' ') {
+                break;
+            }
+            if(ch >= 'a' && ch <= 'z') {
+                len++;
+            }
+            if(ch >= 'A' && ch <= 'Z') {
+                len++;
+            }
+        }
+
+        return len;
     }
 
     /**
@@ -66,7 +219,22 @@ public class MyProgram {
      * https://leetcode.cn/problems/remove-duplicates-from-sorted-array/description/
      */
     public int removeDuplicates(int[] nums) {
-        return 0;
+        if(nums==null || nums.length==0) {
+            return 0;
+        }
+
+        int n = nums.length;
+        int count = 1;
+        int i=1;
+        for(int k=1; k<n; k++) {
+            if(nums[k-1]!=nums[k]) {
+                nums[i] = nums[k];
+                count++;
+                i++;
+            }
+        }
+
+        return count;
     }
 
     /**
@@ -74,7 +242,70 @@ public class MyProgram {
      * https://leetcode.cn/problems/ba-zi-fu-chuan-zhuan-huan-cheng-zheng-shu-lcof/description/
      */
     public int myAtoi(String str) {
-        return 0;
+        if(str==null || str.length()==0) {
+            return 0;
+        }
+        str = str.trim();
+
+        // 去除前导零
+        int index = 0;
+        while(str.charAt(index)=='0') {
+            index++;
+        }
+        if(index>0) {
+            str = str.substring(index, str.length());
+        }
+
+        boolean bigZero = true;
+        if(str.charAt(0)=='+' || str.charAt(0)=='-') {
+            bigZero = str.charAt(0) != '-';
+            str = str.substring(1, str.length());
+        }
+
+        // 去除前导零
+        index = 0;
+        while(str.charAt(index)=='0') {
+            index++;
+        }
+        if(index>0) {
+            str = str.substring(index, str.length());
+        }
+
+        int n = str.length();
+        StringBuilder result = new StringBuilder();
+        if(!bigZero) {
+            result.append("-");
+        }
+
+        for(int i=0; i<n; i++) {
+            char ch = str.charAt(i);
+            if(ch == ' ') {
+                continue;
+            }else if(ch >= '0' && ch <= '9') {
+                result.append(ch);
+            }else {
+                break;
+            }
+        }
+
+        String r = result.toString();
+        if(r.length()==0) {
+            return 0;
+        }
+
+        BigInteger bigInteger = new BigInteger(r);
+        BigInteger maxInteger = BigInteger.valueOf(Integer.MAX_VALUE);
+        BigInteger minInteger = BigInteger.valueOf(Integer.MIN_VALUE);
+
+        while(bigInteger.compareTo(maxInteger) > 0) {
+            bigInteger = bigInteger.subtract(maxInteger);
+        }
+
+        while(bigInteger.compareTo(minInteger) < 0) {
+            bigInteger = bigInteger.add(minInteger);
+        }
+
+        return Integer.parseInt(r);
     }
 
     /**
@@ -87,7 +318,15 @@ public class MyProgram {
      * https://leetcode.cn/problems/rotate-string/
      */
     public boolean rotateString(String s, String goal) {
-        return false;
+        if(s.length()!=goal.length()) {
+            return false;
+        }
+        if(s.equals(goal)) {
+            return true;
+        }
+        StringBuilder sb = new StringBuilder(goal);
+        sb.append(goal);
+        return sb.toString().contains(s);
     }
 
 

@@ -10,6 +10,35 @@ import java.util.Map;
 public class MyRegularity {
 
     /**
+     * 喝啤酒
+     * 3个空瓶子换一瓶啤酒
+     * 7个空瓶盖换一瓶啤酒
+     * 能喝啤酒的最大数
+     */
+    private int drink(int x) {
+        int count = x;
+        int k1 = x;
+        int k2 = x;
+        while(k1>=3 || k2>=7) {
+            while(k1>=3) {
+                int change = k1/3;
+                count += change;
+                k1 %= 3;
+                k1 += change;
+                k2 += change;
+            }
+            while(k2>=7) {
+                int change = k2/7;
+                count += change;
+                k2 %= 7;
+                k1 += change;
+                k2 += change;
+            }
+        }
+        return count;
+    }
+
+    /**
      * 零矩阵
      * https://leetcode.cn/problems/zero-matrix-lcci/description/
      */
@@ -53,8 +82,63 @@ public class MyRegularity {
     }
 
     /**
+     * 零矩阵
+     * https://leetcode.cn/problems/zero-matrix-lcci/description/
+     */
+    public void setZeroes1(int[][] matrix) {
+        if (matrix==null || matrix.length==0 || matrix[0].length==0) {
+            return;
+        }
+
+        int n = matrix.length;
+        int m = matrix[0].length;
+        boolean[] zeroRows = new boolean[n];
+        boolean[] zeroCols = new boolean[m];
+
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<m; j++) {
+                if(matrix[i][j]==0) {
+                    zeroRows[i]=true;
+                    zeroCols[j]=true;
+                }
+            }
+        }
+
+        for(int i=0; i<n; i++) {
+            for(int j=0; j<m; j++) {
+                if(zeroRows[i] || zeroCols[j]) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    /**
      * 扑克牌中的顺子
      */
+    public boolean isStraight(int[] nums) {
+        boolean[] dup = new boolean[14];
+
+        int min = 100;
+        int max = -1;
+        for(int i=0; i<5; i++) {
+            if(nums[i]!=0) {
+                if(dup[nums[i]]) {
+                    return false;
+                }else {
+                    dup[nums[i]] = true;
+                }
+                if(nums[i] < min) {
+                    min = nums[i];
+                }
+                if(nums[i] > max) {
+                    max = nums[i];
+                }
+            }
+        }
+
+        return (max-min) < 5;
+    }
 
     /**
      * 跳水板
@@ -85,38 +169,55 @@ public class MyRegularity {
      * https://leetcode.cn/problems/one-away-lcci/description/
      */
     public boolean oneEditAway(String first, String second) {
-        if(first==null || first.length()==0) {
+        if(first==null && second==null) {
+            return true;
+        }
+        if(first==null || second==null) {
             return false;
         }
-        if(second==null || Math.abs(second.length()-first.length())>1) {
+        if(first.length()==0 && second.length()==0) {
+            return true;
+        }
+        if(Math.abs(second.length()-first.length())>1) {
             return false;
         }
 
-        // 删
-        if(first.length()-1==second.length() && first.contains(second)) {
-            return true;
-        }
-        // 增
-        if(first.length()+1==second.length() && second.contains(first)) {
-            return true;
+        // 增删
+        if(first.length() > second.length()) {
+            return onceUpdateEquals(first, second);
+        }else if(first.length() < second.length()) {
+            return onceUpdateEquals(second, first);
         }
 
         // 改
+        return onceUpdateEquals(first, second);
+    }
+
+    private boolean onceUpdateEquals(String bigger, String lower) {
         boolean flag = true;
+
         int i=0;
         int j=0;
-        while(i<first.length()) {
-            if(first.charAt(i)!=second.charAt(j)) {
-                if(!flag) {
-                    return false;
+        boolean once = true;
+        while(j<lower.length()) {
+            if(bigger.charAt(i)==lower.charAt(j)) {
+                i++;
+                j++;
+            }else {
+                if(once) {
+                    once = false;
+                }else {
+                    flag = false;
+                    break;
                 }
-                flag = false;
+                i++;
+                if(bigger.length()==lower.length()) {
+                    j++;
+                }
             }
-            i++;
-            j++;
         }
 
-        return true;
+        return flag;
     }
 
     /**
@@ -167,37 +268,89 @@ public class MyRegularity {
      * https://leetcode.cn/problems/tic-tac-toe-lcci/description/
      */
     public String tictactoe(String[] board) {
+        // 转换为二维数组
+        boolean hasSpace = false;
         int n = board.length;
-
-        char succ = ' ';
-        int count = 0;
-        boolean space = false;
-
-        // 横行位置 竖行位置 两个对角线
+        char[][] boards = new char[n][n];
         for(int i=0; i<n; i++) {
-            char ch = board[i].charAt(0);
-            count = 1;
+            boards[i] = board[i].toCharArray();
+        }
+
+        boolean determined = false;
+
+        // 检查行
+        for(int i=0; i<n; i++) {
+            if(boards[i][0]==' ') {
+                hasSpace = true;
+                continue;
+            }
+            determined = true;
             for(int j=1; j<n; j++) {
-                if(ch == board[i].charAt(j)) {
-                    count++;
-                }
-                if(ch==' ' && !space) {
-                    space = true;
+                if(boards[i][j]!=boards[i][0]) {
+                    determined = false;
+                    break;
                 }
             }
-            if(count==4) {
-                succ = ch;
-                break;
-            }else {
-                count=1;
+            if(determined) {
+                return ""+boards[i][0];
             }
         }
 
-        if(succ!=' ') {
-            return String.valueOf(succ);
+        // 检查列
+        for(int j=0; j<n; j++) {
+            if (boards[0][j] == ' ') {
+                hasSpace = true;
+                continue;
+            }
+            determined = true;
+            for (int i = 1; i < n; i++) {
+                if (boards[i][j] != boards[0][j]) {
+                    determined = false;
+                    break;
+                }
+            }
+            if (determined) {
+                return "" + boards[0][j];
+            }
         }
 
-        if(space) {
+        // 检查对角线 左上右下
+        if(boards[0][0]!=' ') {
+            int i=1;
+            int j=1;
+            determined=true;
+            while(i<n && j<n) {
+                if(boards[i][j]!=boards[0][0]) {
+                    determined=false;
+                    break;
+                }
+                i++;
+                j++;
+            }
+            if(determined) {
+                return ""+boards[0][0];
+            }
+        }
+
+        // 检查对角线 左下右上
+        if(boards[n-1][0]!=' ') {
+            int i=n-2;
+            int j=1;
+            determined=true;
+            while(i>=0 && j<n) {
+                if(boards[i][j]!=boards[n-1][0]) {
+                    determined=false;
+                    break;
+                }
+                i--;
+                j++;
+            }
+            if(determined) {
+                return ""+boards[n-1][0];
+            }
+        }
+
+        if(hasSpace) {
             return "Pending";
         }
 
@@ -242,7 +395,32 @@ public class MyRegularity {
      * 是否可以到达数组位置为0的地方
      */
     public boolean canReachZero(int[] arr, int start) {
-        return false;
+        boolean[] visited = new boolean[arr.length];
+        boolean reached = false;
+        canReachZeroHandle(arr, visited, start, reached);
+        return reached;
+    }
+
+    public void canReachZeroHandle(int[] arr, boolean[] visited, int index, boolean reached) {
+        if(reached) {
+            return;
+        }
+        if(arr[index] == 0) {
+            reached = true;
+            return;
+        }
+
+        visited[index] = true;
+
+        int left = index - arr[index];
+        if(left >=0 && left < arr.length && !visited[left]) {
+            canReachZeroHandle(arr, visited, left, reached);
+        }
+
+        int right = index + arr[index];
+        if(right >=0 && right < arr.length && !visited[right]) {
+            canReachZeroHandle(arr, visited, right, reached);
+        }
     }
 
     /**
@@ -271,11 +449,27 @@ public class MyRegularity {
      * https://leetcode.cn/problems/search-a-2d-matrix-ii/description/
      */
     public boolean searchMatrix(int[][] matrix, int target) {
-        return false;
-    }
+        boolean flag = false;
+        if(matrix==null || matrix.length==0 || matrix[0].length==0) {
+            return flag;
+        }
 
-    /**
-     *
-     */
+        int n = matrix.length;
+        int m = matrix[0].length;
+        int i = 0;
+        int j = m-1;
+        while(i<n && j>=0) {
+            if(matrix[i][j]==target) {
+                flag = true;
+                break;
+            }else if(matrix[i][j]<target) {
+                i++;
+            }else {
+                j--;
+            }
+        }
+
+        return flag;
+    }
 
 }
