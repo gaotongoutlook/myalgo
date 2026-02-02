@@ -1,5 +1,6 @@
 package com.nowcoder.program;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -241,7 +242,7 @@ public class MyProgram {
      * 把字符串转换成整数
      * https://leetcode.cn/problems/ba-zi-fu-chuan-zhuan-huan-cheng-zheng-shu-lcof/description/
      */
-    public int myAtoi(String str) {
+    public int myAtoi1(String str) {
         if(str==null || str.length()==0) {
             return 0;
         }
@@ -275,6 +276,14 @@ public class MyProgram {
         StringBuilder result = new StringBuilder();
         if(!bigZero) {
             result.append("-");
+        }
+
+        // 最开始为非数字的相关字符
+        for(int i=0; i<n; i++) {
+            char ch = str.charAt(i);
+            if(ch >= '0' && ch <= '9') {
+                break;
+            }
         }
 
         for(int i=0; i<n; i++) {
@@ -329,5 +338,78 @@ public class MyProgram {
         return sb.toString().contains(s);
     }
 
+    public static void main(String[] args) {
+        String str = "words and 987";
+        int result = new MyProgram().myAtoi(str);
+        System.out.println(result);
 
+        str = "4193 with words";
+        result = new MyProgram().myAtoi(str);
+        System.out.println(result);
+
+        str = "-91283472332";
+        result = new MyProgram().myAtoi(str);
+        System.out.println(result);
+    }
+
+    public int myAtoi(String str) {
+        if(str==null || str.length()==0) {
+            return 0;
+        }
+
+        // 字符串在前 空格在前 多余的0在前 正负号在前 字符串在后 空格在后 空格在中间 数字超限
+        // 如果字符串在前 则返回0 如果字符串在后 则返回字符串前边
+        boolean positive = true;
+        boolean decimalPoint = false;
+        boolean hasNumber = false;
+        boolean onceSymbol = false;
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<str.length(); i++) {
+            char ch = str.charAt(i);
+            // 没有数字之前 出现空格没事 出现数字没事 出现字母或者小数点 直接返回为0
+            // 没有数字之前 出现正好和负号 需要做处理 正号忽略 负号添加
+            if(!hasNumber && ch == ' ') {
+                continue;
+            }else if(!hasNumber && (ch == '+' || ch == '-') && !onceSymbol) {
+                positive = ch != '-';
+                onceSymbol = true;
+                if(!positive) {
+                    sb.append("-");
+                }
+            }
+            else if(!hasNumber && (ch < '0' || ch > '9')) {
+                return 0;
+            }else if(hasNumber && ch == ' ') {
+                break;
+            }else if(hasNumber && ch == '.' && decimalPoint) {
+                break;
+            }
+
+            if(ch >= '0' && ch <= '9') {
+                sb.append(ch);
+                hasNumber = true;
+            }else if(ch == '.') {
+                decimalPoint = true;
+                sb.append(".");
+            }
+        }
+
+        // 注意拼接字符串最后一个字符为小数点
+        if(sb.length()>0 && sb.charAt(sb.length()-1)=='.') {
+            sb.deleteCharAt(sb.length()-1);
+            decimalPoint = false;
+        }
+
+        // 先处理越界问题
+        BigDecimal bigInteger = new BigDecimal(sb.toString());
+        BigDecimal maxValue = BigDecimal.valueOf(Integer.MAX_VALUE);
+        BigDecimal minValue = BigDecimal.valueOf(Integer.MIN_VALUE);
+        if(bigInteger.compareTo(minValue) < 0) {
+            return Integer.MIN_VALUE;
+        }else if(bigInteger.compareTo(maxValue) > 0) {
+            return Integer.MAX_VALUE;
+        }
+
+        return bigInteger.intValue();
+    }
 }
