@@ -24,7 +24,7 @@ public class MatchingModel {
                 if(t1[i-1] == t2[j-1]) {
                     // 三种比较最大值，匹配了增加一，不匹配的两种情况，取最大值
                     dp[i][j] = Math.max(Math.max(dp[i-1][j], dp[i][j-1]), dp[i-1][j-1]+1);
-                } else {
+                }else {
                     // 没有匹配*
                     dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
                 }
