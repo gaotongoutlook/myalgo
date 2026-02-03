@@ -238,4 +238,71 @@ public class MyGreedy {
         return count;
     }
 
+
+    public static int maxActivities111(int[][] activities) {
+        if(activities==null || activities.length==0 || activities[0].length==0) {
+            return 0;
+        }
+
+        int n = activities.length;
+        int[] startTime = new int[n];
+        int[] endTime = new int[n];
+
+        for(int i=0; i<n; i++) {
+            startTime[i] = activities[i][0];
+            endTime[i] = activities[i][1];
+        }
+
+        Arrays.sort(startTime);
+        Arrays.sort(endTime);
+
+        int total = 0;
+        int endIndex = 0;
+        for(int i=0; i<n; i++) {
+            if(startTime[i]<endTime[endIndex]) {
+                endIndex++;
+            }else {
+                total++;
+            }
+        }
+
+        return total;
+    }
+
+
+    public int candy111 (int[] arr) {
+        if(arr==null || arr.length==0) {
+            return 0;
+        }
+
+        int n = arr.length;
+        int[] totalArr = new int[n];
+        for(int i=0; i<n; i++) {
+            totalArr[i] = 1;
+        }
+        for(int i=1; i<n; i++) {
+            if(arr[i] > arr[i-1]) {
+                totalArr[i] = totalArr[i-1]+1;
+            }else if(arr[i] == arr[i-1]) {
+                totalArr[i] = totalArr[i-1];
+            }
+        }
+        for(int i=n-2; i>=0; i--) {
+            if(arr[i] > arr[i+1]) {
+                totalArr[i] = Math.max(totalArr[i], totalArr[i+1]+1);
+            }else if(arr[i] == arr[i-1]) {
+                totalArr[i] = Math.max(totalArr[i], totalArr[i+1]);
+            }
+        }
+
+        int total = 0;
+        for(int t : totalArr) {
+            total += t;
+        }
+
+        return total;
+    }
+
+
+
 }
