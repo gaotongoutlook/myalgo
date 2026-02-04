@@ -333,4 +333,116 @@ public class Demo {
         return minStart == -1 ? "" : s.substring(minStart, minStart + minSize);
     }
 
+    /**
+     *
+     */
+    public String LCS (String s1, String s2) {
+        if(s1==null || s1.length()==0 || s2==null || s2.length()==0) {
+            return "";
+        }
+
+        int n = s1.length();
+        int m = s2.length();
+        int[][] dp = new int[n+1][m+1];
+
+        for(int i=1; i<=n; i++) {
+            for(int j=1; j<=m; j++) {
+                if(s1.charAt(i-1)==s2.charAt(j-1)) {
+                    dp[i][j] = dp[i-1][j-1]+1;
+                }else {
+                    dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                }
+            }
+        }
+
+        if(dp[n][m]<=0) {
+            return "-1";
+        }
+
+        return buildLCS(s1, s2, dp);
+    }
+
+    private String buildLCS(String s1, String s2, int[][] dp) {
+        int i = s1.length();
+        int j = s2.length();
+
+        StringBuilder sb = new StringBuilder();
+        while(i>0 && j>0) {
+            if(s1.charAt(i-1)==s2.charAt(j-1)) {
+                sb.append(s1.charAt(i-1));
+                i--;
+                j--;
+            }else if(dp[i-1][j] > dp[i][j-1]) {
+                i--;
+            }else{
+                j--;
+            }
+        }
+
+        return sb.reverse().toString();
+    }
+
+    /**
+     * 编辑距离
+     */
+    public int minDistance(String word1, String word2) {
+        if(word1==null || word1.length()==0) {
+            return word2==null ? 0 : word2.length();
+        }
+        if(word2==null || word2.length()==0) {
+            return word1.length();
+        }
+
+        int n = word1.length();
+        int m = word2.length();
+        char[] w1 = word1.toCharArray();
+        char[] w2 = word2.toCharArray();
+        int[][] dp = new int[n+1][m+1];
+        for(int i=0; i<=m; i++) {
+            dp[0][i] = i;
+        }
+        for(int i=0; i<=n; i++) {
+            dp[i][0] = i;
+        }
+
+        for(int i=1; i<=n; i++) {
+            for(int j=1; j<=m; j++) {
+                if(w1[i-1]==w2[j-1]) {
+                    dp[i][j] = dp[i-1][j-1];
+                }else {
+                    dp[i][j] = Math.min(dp[i-1][j-1], Math.min(dp[i-1][j], dp[i][j-1]));
+                }
+            }
+        }
+
+        return dp[n][m];
+    }
+
+    /**
+     * 最长递增子序列
+     */
+    public int lengthOfLIS(int[] nums) {
+        int n = nums.length;
+        int[] dp = new int[n];
+        dp[0] = 1;
+        for(int i=1; i<n; i++) {
+            dp[i] = 1;
+            for(int j=0; j<i; j++) {
+                if(nums[i] > nums[j]) {
+                    dp[i] = Math.max(dp[i], dp[j]+1);
+                }
+            }
+        }
+        int result = 0;
+        for(int i=0; i<n; i++) {
+            if(dp[i] > result) {
+                result = dp[i];
+            }
+        }
+        return result;
+    }
+
+
+
+
 }
