@@ -11,8 +11,6 @@ public class RobberyModel {
 
     /**
      * 相邻的不能打劫
-     * @param nums
-     * @return
      */
     public int rob(int[] nums) {
         if(nums.length == 0) {
@@ -21,7 +19,7 @@ public class RobberyModel {
 
         // dp[i][0]表示第i个物品没有选时的最大金额
         // dp[i][1]表示第i个物品选择时的最大金额
-        /*int n = nums.length;
+        int n = nums.length;
         int[][] dp = new int[n][2];
         dp[0][0] = 0;
         dp[0][1] = nums[0];
@@ -30,14 +28,11 @@ public class RobberyModel {
             dp[i][1] = dp[i-1][0] + nums[i];
         }
 
-        return Math.max(dp[n-1][0], dp[n-1][1]);*/
-        return robDp(nums, 0, nums.length-1);
+        return Math.max(dp[n-1][0], dp[n-1][1]);
     }
 
     /**
      * 二叉树，相邻的不能打劫
-     * @param root
-     * @return
      */
     public int rob(TreeNode root) {
         int[] money = postorder(root);

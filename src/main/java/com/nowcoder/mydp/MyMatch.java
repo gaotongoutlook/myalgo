@@ -157,7 +157,7 @@ public class MyMatch {
                     dp[i][j] = dp[i-1][j-1]; // 字符相同不需要操作
                 }else {
                     // 字符不同 增加 删除 或者替换 转换到当前操作
-                    dp[i][j] = min3(dp[i-1][j]+1, dp[i][j-1]+1, dp[i-1][j-1]+1);
+                    dp[i][j] = Math.min(dp[i-1][j-1], Math.min(dp[i][j-1], dp[i-1][j])) + 1;
                 }
             }
         }

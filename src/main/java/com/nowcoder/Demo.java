@@ -442,7 +442,40 @@ public class Demo {
         return result;
     }
 
+    /**
+     * 兑换零钱(一)
+     * 可以使用重复钱币
+     */
+    public int minMoney (int[] arr, int aim) {
+        if(arr==null || arr.length==0) {
+            return -1;
+        }
+        Arrays.sort(arr);
+        if(aim < arr[0]) {
+            return -1;
+        }
+        int n = arr.length;
+        int[] dp = new int[aim+1];
+        for(int i=0; i<=aim; i++) {
+            dp[i] = Integer.MAX_VALUE;
+        }
 
+        dp[0] = 0;
+        for(int i=1; i<=aim; i++) {
+            for(int j=0; j<arr.length; j++) {
+                if(i-arr[j]>=0 && dp[i]!=Integer.MAX_VALUE && dp[i-arr[j]]+1<dp[i]) {
+                    dp[i] = dp[i-arr[j]]+1;
+                }
+            }
+
+        }
+
+        if(dp[aim]==Integer.MAX_VALUE) {
+            return -1;
+        }
+
+        return dp[aim];
+    }
 
 
 }

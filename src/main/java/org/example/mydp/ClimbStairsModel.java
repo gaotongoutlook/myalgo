@@ -55,29 +55,55 @@ public class ClimbStairsModel {
 
     /**
      * 零钱兑换 总共有多少种兑换方式
+     *
+     * coins = [1, 2, 5], amount = 5
+     *
+     * 初始化: dp = [1, 0, 0, 0, 0, 0]
+     *
+     * 用硬币1:
+     * dp[1] += dp[0] → 1
+     * dp[2] += dp[1] → 1
+     * dp[3] += dp[2] → 1
+     * dp[4] += dp[3] → 1
+     * dp[5] += dp[4] → 1
+     * 此时: dp = [1, 1, 1, 1, 1, 1]
+     *
+     * 用硬币2:
+     * dp[2] += dp[0] → 1+1=2
+     * dp[3] += dp[1] → 1+1=2
+     * dp[4] += dp[2] → 1+2=3
+     * dp[5] += dp[3] → 1+2=3
+     * 此时: dp = [1, 1, 2, 2, 3, 3]
+     *
+     * 用硬币5:
+     * dp[5] += dp[0] → 3+1=4
+     * 最终: dp = [1, 1, 2, 2, 3, 4]
+     *
+     * 结果: 4种组合方式
+     * 1) 1+1+1+1+1
+     * 2) 1+1+1+2
+     * 3) 1+2+2
+     * 4) 5
      */
-    public int coinChangeTotal(int[] coins, int amount) {
-        int k = coins.length;
-        int[] dp = new int[amount+1];
-        for(int i=0; i<=amount; i++) {
-            dp[i] = Integer.MAX_VALUE;
-        }
+    public int coinChangeTotal(int amount, int[] coins) {
+        // dp[i] 表示凑成金额 i 的硬币组合数
+        int[] dp = new int[amount + 1];
 
-        dp[0] = 0;
-        for(int i=1; i<=amount; i++) {
-            for(int j=0; j<k; j++) {
-                if(i-coins[j]>=0 && dp[i-coins[j]]!=Integer.MAX_VALUE) {
-                    dp[i] += dp[i-coins[j]];
-                }
+        // 初始化：凑0元只有1种方法（不选任何硬币）
+        dp[0] = 1;
+
+        // 遍历每种硬币
+        for (int coin : coins) {
+            // 遍历所有金额（从coin开始，因为小于coin的金额无法用这个硬币凑）
+            for (int i = coin; i <= amount; i++) {
+                // 如果使用当前硬币coin，那么dp[i] += dp[i-coin]
+                dp[i] += dp[i - coin];
             }
-        }
-
-        if(dp[amount] == Integer.MAX_VALUE) {
-            return -1;
         }
 
         return dp[amount];
     }
+
 
     /**
      * 剪绳子
@@ -165,14 +191,6 @@ public class ClimbStairsModel {
         }
 
         return dp[n];
-    }
-
-    public static void main(String[] args) {
-        int number = 1112225678;
-        ArrayList<String> result = new ClimbStairsModel().translateNumList(number);
-        for(String string : result) {
-            System.out.println(string);
-        }
     }
 
     public ArrayList<String> translateNumList(int num) {

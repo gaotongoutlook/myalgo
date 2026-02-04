@@ -17,9 +17,6 @@ public class PathModel {
     /**
      * 最小路径和
      * 从左上角到右下角，使得路径上的数字总和为最小
-     *
-     * @param grid
-     * @return
      */
     public int minPathSum(int[][] grid) {
         int m = grid.length;
@@ -53,10 +50,6 @@ public class PathModel {
     /**
      * 不同路径
      * 到达某一点有多少种到达方法
-     *
-     * @param m
-     * @param n
-     * @return
      */
     public int uniquePaths(int m, int n) {
         int[][] dp = new int[m][n];
@@ -125,9 +118,6 @@ public class PathModel {
 
     /**
      * 礼物的最大价值
-     *
-     * @param grid
-     * @return
      */
     public int maxValue(int[][] grid) {
         int m = grid.length;
@@ -160,9 +150,6 @@ public class PathModel {
 
     /**
      * 三角形最小路径和
-     *
-     * @param triangle
-     * @return
      */
     public int minimumTotal(List<List<Integer>> triangle) {
         int n = triangle.size();
