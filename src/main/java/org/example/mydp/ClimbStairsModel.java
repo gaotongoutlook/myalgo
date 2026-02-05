@@ -55,7 +55,8 @@ public class ClimbStairsModel {
 
     /**
      * 零钱兑换 总共有多少种兑换方式
-     *
+     * dp[i] += dp[i - coin] 如果我要用这个硬币，那么剩下的钱有多少种凑法
+     * 组合而非排列：通过先循环硬币种类来保证
      * coins = [1, 2, 5], amount = 5
      *
      * 初始化: dp = [1, 0, 0, 0, 0, 0]
@@ -97,11 +98,27 @@ public class ClimbStairsModel {
             // 遍历所有金额（从coin开始，因为小于coin的金额无法用这个硬币凑）
             for (int i = coin; i <= amount; i++) {
                 // 如果使用当前硬币coin，那么dp[i] += dp[i-coin]
+                System.out.println("times "+i);
                 dp[i] += dp[i - coin];
             }
         }
 
         return dp[amount];
+    }
+
+    public static void main(String[] args) {
+        new ClimbStairsModel().coinChangeTotal(5, new int[]{1,2,5});
+    }
+
+    public void pringArr(int[] dp) {
+        System.out.print("[");
+        for(Integer num : dp) {
+            System.out.print(" ");
+            System.out.print(num);
+            System.out.print(" ");
+        }
+        System.out.print("]");
+        System.out.println();
     }
 
 

@@ -6,6 +6,7 @@ package com.nowcoder.mydp;
  * 是否能装满整个背包
  * 正好装满需要最少多少物品
  * 装满背包有多少种装法
+ * 背包问题当前的选择基于之前的选择进行扩展
  */
 public class MyPackage {
 
