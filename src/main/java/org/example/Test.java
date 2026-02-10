@@ -5,6 +5,7 @@ import org.example.pojo.Interval;
 import org.example.pojo.ListNode;
 import org.example.pojo.MyPosi;
 import org.example.pojo.TreeNode;
+import org.example.utils.ListNodeUtils;
 import org.example.utils.PrintUtils;
 
 import java.util.*;
@@ -1705,7 +1706,7 @@ public class Test {
         return newNodes;
     }
 
-    public static void main(String[] args) {
+    public static void main4(String[] args) {
         int[] nums = new int[]{1,2,3,3,2,9};
         int xor = nums[0];
         for(int i=1; i<nums.length; i++) {
@@ -1728,5 +1729,222 @@ public class Test {
             }
         }
     }
+
+    /**
+     * 链表指定区间翻转
+     */
+    public ListNode[] ReverseList (ListNode head) {
+        if(head==null || head.next==null) {
+            return new ListNode[]{head, head};
+        }
+
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur!=null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+
+        return new ListNode[]{pre, head};
+    }
+
+    /**
+     * 翻转链表m到n之间的节点
+     */
+    public ListNode[] reverseBetween (ListNode head, int start, int m, int n) {
+        if(head==null || head.next==null || m==n) {
+            return new ListNode[]{head, head};
+        }
+
+        int count = start;
+        ListNode pre = null;
+        ListNode tail = null;
+        ListNode cur = head;
+        // 首先跳过前边节点
+        while(count<m) {
+            pre = cur;
+            cur = cur.next;
+            count++;
+        }
+        tail = cur;
+
+        // 到达要交换的节点
+        ListNode npre = null;
+        while(cur!=null) {
+            ListNode next = cur.next;
+            cur.next = npre;
+            npre = cur;
+            cur = next;
+            count++;
+            if(count==n) {
+                tail.next = cur;
+                if(pre!=null) {
+                    pre.next = npre;
+                }else {
+                    pre = npre;
+                }
+                break;
+            }
+        }
+
+        // 末尾遍历
+        ListNode nnpre = null;
+        while(cur!=null) {
+            nnpre = cur;
+            cur = cur.next;
+        }
+
+        return new ListNode[]{head, nnpre};
+    }
+
+
+    public ListNode reversePass(ListNode head, int left, int right) {
+        if (head == null || head.next==null || left == right) {
+            return head;
+        }
+
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        // Step 1: 移动到 left 的前一个节点
+        ListNode pre = dummy;
+        for (int i = 1; i < left; i++) {
+            pre = pre.next;
+        }
+
+        // Step 2: 开始翻转
+        ListNode curr = pre.next; // left 节点
+        ListNode next = null;
+
+        // 头插法：将 curr 的下一个节点不断插入到 pre 后面
+        for (int i = left; i < right; i++) {
+            next = curr.next;
+            curr.next = next.next;
+            next.next = pre.next;
+            pre.next = next;
+        }
+
+        return dummy.next;
+    }
+
+
+
+    public ListNode reverseBetweenThreePointers(ListNode head, int left, int right) {
+        if (head == null || left >= right) {
+            return head;
+        }
+
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+
+        // Step 1: 定位 pre（left 前一个节点）
+        ListNode pre = dummy;
+        for (int i = 1; i < left; i++) {
+            pre = pre.next;
+        }
+
+        // Step 2: 初始化指针
+        // pre: left 前一个节点，固定不变
+        // cur: 当前要处理的节点，初始为 left 节点
+        // next: cur 的下一个节点，需要插入到 pre 后面
+
+        ListNode cur = pre.next;  // left 节点
+        ListNode next = null;
+
+        // Step 3: 尾插法翻转
+        // 每次将 cur.next 插入到 pre.next 的位置
+        for (int i = left; i < right; i++) {
+            // 保存 cur 的下一个节点
+            next = cur.next;
+
+            // 将 cur.next 指向 next 的下一个节点
+            cur.next = next.next;
+
+            // 将 next 插入到 pre 后面
+            next.next = pre.next;
+            pre.next = next;
+
+            // cur 保持指向原来的 left 节点（现在是区间尾节点）
+            // next 在下一轮循环中会重新指向 cur.next
+        }
+
+        return dummy.next;
+    }
+
+
+    public ListNode[] reversePass1(ListNode head, int left, int right) {
+        if(head==null || head.next==null || right==left) {
+            return new ListNode[]{head, head};
+        }
+
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode pre = dummy; // 前一个节点
+        ListNode cur = head;
+        for(int i=1; i<left; i++) {
+            pre = cur;
+            cur = cur.next;
+        }
+        ListNode end = cur; // 最末一个节点
+
+        ListNode tail = null;
+        for(int i=left; i<=right; i++) {
+            ListNode next = cur.next;
+            cur.next = tail;
+            tail = cur;
+            cur = next;
+        }
+
+        if(cur!=null) {
+            end.next = cur;
+        }
+        pre.next = tail;
+
+        /*while(tail!=null && tail.next!=null) {
+            tail = tail.next;
+        }
+*/
+        return new ListNode[]{dummy.next, tail};
+    }
+
+    public ListNode reverseKGroup (ListNode head, int k) {
+        if(head==null || head.next==null || k<=1) {
+            return head;
+        }
+
+        int count = 1;
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode pre = dummy;
+        ListNode top = dummy.next;
+        ListNode cur = head;
+        while(cur!=null) {
+            ListNode next = cur.next;
+            if(count==k) {
+               ListNode[] rarr = reversePass1(top, 1, k);
+               pre.next = rarr[0];
+               pre = rarr[1];
+               pre.next = next;
+               top = next;
+               count = 1;
+            }else {
+                count++;
+            }
+            cur = next;
+        }
+
+        return dummy.next;
+    }
+
+    public static void main(String[] args) {
+        int[] nums = new int[]{1,2,3,4,5};
+        ListNode result = ListNodeUtils.buildListNode(nums);
+        ListNode r = new Test().reverseKGroup(result, 2);
+        ListNodeUtils.printListNode(r);
+    }
+
+
 
 }
