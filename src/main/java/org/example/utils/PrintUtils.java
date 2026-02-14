@@ -38,4 +38,31 @@ public class PrintUtils {
         System.out.println();
     }
 
+    public static void printArr(int[] arr) {
+        int n = arr.length;
+        System.out.println();
+        System.out.print("[");
+        for(int i=0; i<n; i++) {
+            System.out.print(" "+arr[i]+" ");
+        }
+        System.out.print("]");
+        System.out.println();
+    }
+
+    public static void printArr(int[][] arr) {
+        int n = arr.length;
+        int m = arr[0].length;
+        System.out.println();
+        System.out.println("[");
+        for(int i=0; i<n; i++) {
+            System.out.print("[");
+            for(int j=0; j<m; j++) {
+                System.out.print(" "+arr[i][j]+" ");
+            }
+            System.out.println("]");
+        }
+        System.out.print("]");
+        System.out.println();
+    }
+
 }

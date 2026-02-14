@@ -86,7 +86,7 @@ public class ClimbStairsModel {
      * 3) 1+2+2
      * 4) 5
      */
-    public int coinChangeTotal(int amount, int[] coins) {
+    public int  coinChangeTotal(int amount, int[] coins) {
         // dp[i] 表示凑成金额 i 的硬币组合数
         int[] dp = new int[amount + 1];
 
