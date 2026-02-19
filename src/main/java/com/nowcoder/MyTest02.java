@@ -22,7 +22,6 @@ public class MyTest02 {
         }
 
         PrintUtils.printArr(dp);
-
         return dp[m][n];
     }
 
