@@ -1,8 +1,6 @@
 package com.collection;
 
 import org.example.pojo.TreeNode;
-
-import javax.lang.model.type.ErrorType;
 import java.util.List;
 
 /**
