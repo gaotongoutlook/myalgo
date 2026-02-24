@@ -1938,13 +1938,74 @@ public class Test {
         return dummy.next;
     }
 
-    public static void main(String[] args) {
+    public static void main5(String[] args) {
         int[] nums = new int[]{1,2,3,4,5};
         ListNode result = ListNodeUtils.buildListNode(nums);
         ListNode r = new Test().reverseKGroup(result, 2);
         ListNodeUtils.printListNode(r);
     }
 
+    /**
+     * 最小覆盖子串
+     */
+    public String minWindow123(String s, String t) {
+        if(s==null || t==null || s.length()==0 || t.length()==0) {
+            return "";
+        }
 
+        Map<Character, Integer> tmap = new HashMap<>();
+        Map<Character, Integer> smap = new HashMap<>();
+
+        for(char c : t.toCharArray()) {
+            tmap.put(c, tmap.getOrDefault(c, 0)+1);
+        }
+
+        int minSize = Integer.MAX_VALUE;
+        int minStart = -1;
+        int left = 0;
+        int right = 0;
+        while(right < s.length()) {
+            char rc = s.charAt(right);
+            if(tmap.containsKey(rc)) {
+                smap.put(rc, tmap.getOrDefault(rc, 0)+1);
+            }
+            right++;
+
+            while(match(tmap, smap)) {
+                if(right-left < minSize) {
+                    minSize = right-left;
+                    minStart = left;
+                }
+                char lc = s.charAt(left);
+                if(tmap.containsKey(lc)) {
+                    int count = smap.get(lc);
+                    if(count==1) {
+                        smap.remove(lc);
+                    }else {
+                        smap.put(lc, count-1);
+                    }
+                }
+                left++;
+            }
+        }
+
+        return minStart==-1 ? "" : s.substring(minStart, minSize+minStart);
+    }
+
+    private boolean match(Map<Character, Integer> tmap, Map<Character, Integer> smap) {
+        boolean flag = true;
+        for(Map.Entry<Character, Integer> entry : tmap.entrySet()) {
+            Character key = entry.getKey();
+            if(smap.containsKey(key) && smap.get(key)!=entry.getValue()) {
+                flag = false;
+                break;
+            }
+        }
+        return flag;
+    }
+
+    public static void main(String[] args) {
+
+    }
 
 }
