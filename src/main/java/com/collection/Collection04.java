@@ -73,6 +73,7 @@ public class Collection04 {
 
     /**
      * 课程表
+     * https://leetcode.cn/problems/course-schedule/description/
      */
     public boolean canFinish(int numCourses, int[][] prerequisites) {
         return false;

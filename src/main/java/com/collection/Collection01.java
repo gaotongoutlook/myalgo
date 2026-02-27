@@ -47,6 +47,7 @@ public class Collection01 {
 
     /**
      * 无重复子串的最长子串
+     * https://leetcode.cn/problems/wtcaE1/description/?envType=problem-list-v2&envId=xd310pkt
      */
     public int lengthOfLongestSubstring(String s) {
         return 0;
@@ -54,6 +55,7 @@ public class Collection01 {
 
     /**
      * 两数相加
+     * https://leetcode.cn/problems/add-two-numbers/
      */
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
         return null;
@@ -61,6 +63,7 @@ public class Collection01 {
 
     /**
      * 有效的括号
+     * https://leetcode.cn/problems/valid-parentheses/description/
      */
     public boolean isValid(String s) {
         return false;
@@ -68,6 +71,7 @@ public class Collection01 {
 
     /**
      * 最长回文子串
+     * https://leetcode.cn/problems/longest-palindromic-substring/
      */
     public String longestPalindrome(String s) {
         return null;
@@ -82,6 +86,7 @@ public class Collection01 {
 
     /**
      * 爬楼梯
+     * https://leetcode.cn/problems/climbing-stairs/
      */
     public int climbStairs(int n) {
         return 0;
@@ -96,6 +101,7 @@ public class Collection01 {
 
     /**
      * 删除链表的倒数第N个节点
+     * https://leetcode.cn/problems/remove-nth-node-from-end-of-list/
      */
     public ListNode removeNthFromEnd(ListNode head, int n) {
         return null;
@@ -103,6 +109,7 @@ public class Collection01 {
 
     /**
      * 合并两个有序链表
+     * https://leetcode.cn/problems/merge-two-sorted-lists/description/
      */
     public ListNode mergeTowLists(ListNode l1, ListNode l2) {
         return null;
@@ -117,6 +124,7 @@ public class Collection01 {
 
     /**
      * 在排序数组中查找元素的第一个和最后一个位置
+     * https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/
      */
     public int[] searchRange(int[] nums, int target) {
         return null;

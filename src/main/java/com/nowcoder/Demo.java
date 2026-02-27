@@ -503,7 +503,12 @@ public class Demo {
         return dp[amount];
     }
 
-
+    /**
+     * 最小覆盖子串
+     */
+    public String minWindow1 (String S, String T) {
+        return null;
+    }
 
 
 

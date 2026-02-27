@@ -1,9 +1,13 @@
 package com.nowcoder;
 
+import com.sun.xml.internal.bind.CycleRecoverable;
+import javafx.scene.input.Mnemonic;
 import org.example.pojo.ListNode;
 import org.example.pojo.TreeNode;
-import java.util.List;
-import java.util.Stack;
+import sun.plugin.dom.exception.BrowserNotSupportedException;
+
+import javax.swing.*;
+import java.util.*;
 
 public class MyTest03 {
 
@@ -11,41 +15,167 @@ public class MyTest03 {
      * 两数之和
      */
     public int[] twoSum(int[] nums, int target) {
-        return null;
+        if(nums==null || nums.length==0) {
+            return new int[]{-1, -1};
+        }
+
+        int n = nums.length;
+        int[][] numbers = new int[n][2];
+        for(int i=0; i<n; i++) {
+            numbers[i][0] = nums[i];
+            numbers[i][1] = i;
+        }
+
+        Arrays.sort(numbers);
+        int i=0;
+        int j=n-1;
+        while(i<j) {
+            int sum = numbers[i][0] + numbers[j][0];
+            if(sum==target) {
+                return new int[]{numbers[i][1], numbers[j][1]};
+            }else if(sum<target) {
+                i++;
+            }else {
+                j--;
+            }
+        }
+
+        return new int[]{-1, -1};
     }
 
     /**
      * 翻转链表
      */
     public ListNode reverseList(ListNode head) {
-        return null;
+        if(head==null || head.next==null) {
+            return head;
+        }
+
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur!=null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            cur = next;
+            pre = cur;
+        }
+
+        return pre;
     }
 
     /**
      * 无重复子串的最长子串
      */
     public int lengthOfLongestSubstring(String s) {
-        return 0;
+        if(s.length()<=1) {
+            return s.length();
+        }
+
+        Map<Character, Integer> map = new HashMap<>();
+        int len = s.length();
+        int i=0;
+        int j=0;
+        int maxLen = 0;
+        while(j<s.length()) {
+            char c = s.charAt(j);
+            if(!map.containsKey(c)) {
+                map.put(c, j);
+                j++;
+                maxLen = Math.max(maxLen, j-i);
+                continue;
+            }
+            while(map.containsKey(c)) {
+                map.remove(s.charAt(i));
+                i++;
+            }
+        }
+
+        return maxLen;
     }
 
     /**
      * 两数相加
      */
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        return null;
+        if(l1==null || l2==null) {
+            return l1==null ? l2 : l1;
+        }
+
+        ListNode dummy = new ListNode(-1);
+        ListNode cur = dummy;
+
+        int carry = 0;
+        while(l1!=null || l2!=null) {
+            int sum = carry;
+            if(l1!=null) {
+                sum += l1.val;
+            }
+            if(l2!=null) {
+                sum += l2.val;
+            }
+
+            if(sum>9) {
+                carry = 1;
+                sum %= 10;
+            }else {
+                carry = 0;
+            }
+
+            cur.next = new ListNode(sum);
+            cur = cur.next;
+            if(l1!=null) {
+                l1 = l1.next;
+            }
+            if(l2!=null) {
+                l2 = l2.next;
+            }
+        }
+
+        if(carry>0) {
+            cur.next = new ListNode(carry);
+            cur = cur.next;
+        }
+
+        return dummy.next;
     }
 
     /**
      * 有效的括号
      */
     public boolean isValid(String s) {
-        return false;
+        if(s==null || s.length()==0) {
+            return true;
+        }
+        if(s.length()%2==1) {
+            return false;
+        }
+        Stack<Character> stack = new Stack<>();
+        for(char c : s.toCharArray()) {
+            if(c=='(') {
+                stack.push(')');
+            }else if(c=='{') {
+                stack.push('}');
+            }else if(c=='[') {
+                stack.push(']');
+            }else {
+                // 如果都是右括号
+                if(stack.isEmpty()) {
+                    return false;
+                }
+                char p = stack.pop();
+                if(p!=c) {
+                    return false;
+                }
+            }
+        }
+        return stack.isEmpty();
     }
 
     /**
      * 最长回文子串
      */
     public String longestPalindrome(String s) {
+
         return null;
     }
 
@@ -60,7 +190,19 @@ public class MyTest03 {
      * 爬楼梯
      */
     public int climbStairs(int n) {
-        return 0;
+        if(n==1) {
+            return 1;
+        }
+        if(n==2) {
+            return 2;
+        }
+        int[] dp = new int[n+1];
+        dp[0] = 1;
+        dp[1] = 1;
+        for(int i=2; i<=n; i++) {
+            dp[i] = dp[i-1] + dp[i-2];
+        }
+        return dp[n];
     }
 
     /**
@@ -74,14 +216,52 @@ public class MyTest03 {
      * 删除链表的倒数第N个节点
      */
     public ListNode removeNthFromEnd(ListNode head, int n) {
-        return null;
+        if(head==null || n<=0) {
+            return head;
+        }
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        int count = n;
+        ListNode nth = dummy;
+
+
+        return dummy.next;
     }
 
     /**
      * 合并两个有序链表
      */
     public ListNode mergeTowLists(ListNode l1, ListNode l2) {
-        return null;
+        if(l1==null || l2==null) {
+            return l1==null ? l2 : l1;
+        }
+
+        ListNode dummy = new ListNode(-1);
+        ListNode cur = dummy;
+        while(l1!=null && l2!=null) {
+            if(l1.val < l2.val) {
+                cur.next = new ListNode(l1.val);
+                l1 = l1.next;
+            }else {
+                cur.next = new ListNode(l2.val);
+                l2 = l2.next;
+            }
+            cur = cur.next;
+        }
+
+        while(l1!=null) {
+            cur.next = new ListNode(l1.val);
+            cur = cur.next;
+            l1 = l1.next;
+        }
+
+        while(l2!=null) {
+            cur.next = new ListNode(l2.val);
+            cur = cur.next;
+            l2 = l2.next;
+        }
+
+        return dummy.next;
     }
 
     /**
@@ -95,7 +275,38 @@ public class MyTest03 {
      * 在排序数组中查找元素的第一个和最后一个位置
      */
     public int[] searchRange(int[] nums, int target) {
-        return null;
+        if(nums==null || nums.length==0) {
+            return new int[]{-1, -1};
+        }
+
+        int left = 0;
+        int right = nums.length-1;
+        while(left < right) {
+            int mid = left + (right-left)>>1;
+            if(nums[mid]==target) {
+                return findSearchRange(nums, target, mid);
+            }else if(nums[mid]<target) {
+                left = mid+1;
+            }else {
+                right = mid-1;
+            }
+        }
+
+        return new int[]{-1, -1};
+    }
+
+    private int[] findSearchRange(int[] nums, int target, int mid) {
+        int left = mid-1;
+        while(left>=0 && nums[left]==target) {
+            left--;
+        }
+
+        int right = mid+1;
+        while(right<nums.length && nums[right]==target) {
+            right++;
+        }
+
+        return new int[]{left+1, right-1};
     }
 
     /**
