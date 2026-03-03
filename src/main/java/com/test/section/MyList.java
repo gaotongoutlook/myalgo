@@ -1,6 +1,8 @@
 package com.test.section;
 
 import org.example.pojo.ListNode;
+
+import java.net.CacheRequest;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -216,7 +218,7 @@ public class MyList {
     /**
      * 判断链表中是否有环
      */
-    public boolean hasCycle(ListNode head) {
+    public boolean hasCycle1(ListNode head) {
         if(head==null || head.next==null) {
             return false;
         }
@@ -225,6 +227,28 @@ public class MyList {
         ListNode slow = head;
         ListNode fast = head.next;
         while (fast!=null && fast.next!=null) {
+            slow = slow.next;
+            fast = fast.next.next;
+            if(slow == fast) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 判断链表是否有环
+     * 推荐使用这种情况
+     */
+    public boolean hasCycle(ListNode head) {
+        if(head==null || head.next==null) {
+            return false;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast!=null && fast.next!=null) {
             slow = slow.next;
             fast = fast.next.next;
             if(slow == fast) {
@@ -271,7 +295,7 @@ public class MyList {
      * 链表中倒数最后k个结点
      * 重点 注意边界条件 比较多和复杂
      */
-    public ListNode FindKthToTail (ListNode pHead, int k) {
+    public ListNode FindKthToTail1 (ListNode pHead, int k) {
         if(pHead==null || k<=0) {
             return null;
         }
@@ -300,11 +324,52 @@ public class MyList {
     }
 
     /**
+     * 链表中倒数最后k个结点
+     */
+    public ListNode FindKthToTail (ListNode pHead, int k) {
+        if (pHead == null || k <= 0) {
+            return null;
+        }
+        ListNode fast = pHead;
+        ListNode slow = pHead;
+        // 快指针先走k步
+        for (int i = 0; i < k; i++) {
+            if (fast == null) {
+                // 如果链表长度小于k，返回null
+                return null;
+            }
+            fast = fast.next;
+        }
+        // 然后快慢指针一起走
+        while (fast != null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return slow;
+    }
+
+    /**
      * 删除链表的倒数第n个节点
      * 注意边界条件
      */
     public ListNode removeNthFromEnd (ListNode head, int n) {
-        return null;
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+
+        ListNode slow = dummy;
+        ListNode fast = dummy;
+        for(int i=0; i<=n; i++) {
+            fast = fast.next;
+        }
+
+        while(fast!=null) {
+            fast = fast.next;
+            slow = slow.next;
+        }
+
+        slow.next = slow.next.next;
+
+        return dummy.next;
     }
 
     /**
@@ -447,7 +512,7 @@ public class MyList {
     /**
      * 判断一个链表是不是回文结构
      */
-    public boolean isPail (ListNode head) {
+    public boolean isPail1 (ListNode head) {
         if(head==null || head.next==null) {
             return true;
         }
@@ -477,6 +542,46 @@ public class MyList {
         }
 
         return false;
+    }
+
+    /**
+     * 判断一个链表是不是回文结构
+     */
+    public boolean isPail (ListNode head) {
+        if(head==null || head.next==null) {
+            return true;
+        }
+
+        ListNode slow = head;
+        ListNode fast = head;
+        while(fast!=null && fast.next!=null) {
+            fast = fast.next.next;
+            slow = slow.next;
+        }
+
+        // 翻转后半部分
+        ListNode pre = null;
+        ListNode cur = slow;
+        while(cur!=null) {
+            ListNode next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = next;
+        }
+
+        ListNode left = head;
+        ListNode right = pre;
+        boolean isPail = true;
+        while(right!=null) {
+            if(left.val != right.val) {
+                isPail = false;
+                break;
+            }
+            left = left.next;
+            right = right.next;
+        }
+
+        return isPail;
     }
 
     /**
@@ -549,7 +654,25 @@ public class MyList {
             return head;
         }
 
-        return null;
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+
+        ListNode pre = dummy;
+        ListNode cur = head;
+        while(cur!=null && cur.next!=null) {
+            if(cur.val == cur.next.val) {
+                int val = cur.val;
+                while(cur!=null && cur.val==val) {
+                    cur = cur.next;
+                }
+                pre.next = cur;
+            }else {
+                pre = cur;
+                cur = cur.next;
+            }
+        }
+
+        return dummy.next;
     }
 
 }

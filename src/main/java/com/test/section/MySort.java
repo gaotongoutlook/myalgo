@@ -170,11 +170,25 @@ public class MySort {
      * 时间复杂度 平均n方 最好n 最坏n方
      * 空间复杂度 1 原地排序
      * 稳定
-     * 思想是
+     * 思想是将数组分为「已排序区间」和「未排序区间」，每次从未排序区间取出一个元素，插入到已排序区间的合适位置，直到整个数组有序
      */
     public void insertionSort(int[] arr) {
-        int n = arr.length;
+        if(arr==null || arr.length<=1) {
+            return;
+        }
 
+        for(int i=1; i<arr.length; i++) {
+            int current = arr[i];
+            for(int j=i-1; j>=0; j--) {
+                if(arr[j] > current) {
+                    arr[j+1] = arr[j];
+                    j--;
+                }else {
+                    arr[j+1] = current;
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -182,7 +196,7 @@ public class MySort {
      * 时间复杂度 平均nlogn 最好nlogn 最坏nlogn
      * 空间复杂度 1 原地排序
      * 不稳定
-     * 思想是
+     * 思想是利用完全二叉树结构的「堆」这种数据结构，先将待排序数组构建成大顶堆（父节点值 ≥ 子节点值），然后反复将堆顶的最大值交换到数组末尾，再对剩余元素重新调整为大顶堆，直到整个数组有序
      */
     public void heapSort(int[] arr) {
 
